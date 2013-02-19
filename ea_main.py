@@ -21,6 +21,8 @@ def evolutionary_algorithm(initial, development, fitness_test,
         generation_list += culled_population
         if done(culled_population, fitness_goal):
             break
+        # TODO: Uncomment this if Pauline wills it. Also use retested_population in next line.
+        # retested_population = fitness_test(culled_population) # retested_population: [(gtype, ptype, fitness, age) list]
         parents = parent_selection(culled_population) # parents: [(gtype1, gtype2) list]
         offspring = reproduction(parents) # offspring: [(gtype, age) list] (age = 0)
         genotypes = gen_mix(offspring, culled_population)
