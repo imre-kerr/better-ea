@@ -15,7 +15,7 @@ def crossover(gene1, gene2, num_points):
     return crossed_bits
         
 def gen_crossover():
-    '''Generate a crossover function'''
+    '''Generate a crossover function interactively'''
     points = int(raw_input("Input no. of crossover points: "))
     return (lambda gene1, gene2: crossover(gene1, gene2, points))
     
@@ -36,7 +36,7 @@ def genewise_mutate(gene, chance):
     return mutated_bits
     
 def gen_mutate():
-    '''Generate a mutation function'''
+    '''Generate a mutation function interactively'''
     while True:
         if method == 'bitwise':
             chance = float(raw_input("Input per-bit mutation rate: "))
