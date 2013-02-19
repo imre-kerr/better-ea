@@ -10,7 +10,7 @@ class binary_genotype:
             self.bits.append(random.randint(0, 1))
         
 def crossover(gene1, gene2, num_points):
-    points = random.sample(xrange(1, len(gene1) - 1), num_points) + [len(gene1)]
+    points = random.sample(xrange(1, len(gene1.bits) - 1), num_points) + [len(gene1)]
     crossed_bits = gene1.bits.copy()
     for start in xrange(0, len(points)-1, 2):
         end = start + 1
@@ -24,7 +24,7 @@ def gen_crossover():
     
 def bitwise_mutate(gene, chance):
     mutated_bits = gene.bits.copy()
-    for i xrange(len(mutated_bits)):
+    for i in xrange(len(mutated_bits)):
         if random.random() <= chance:
             mutated_bits[i] = mutated_bits[i] ^ 1
     return binary_genotype(mutated_bits)
