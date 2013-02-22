@@ -1,4 +1,5 @@
 from __future__ import division
+from bisect import bisect_left
 import random
 import math
 
