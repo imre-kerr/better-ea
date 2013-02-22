@@ -59,3 +59,10 @@ def dist_spike_interval(train1, train2):
     
     return dist + penalty
 
+def dist_waveform(train1, train2):
+    '''Compute distance between two spike trains using the waveform distance metric'''
+    m = len(train1)
+    p = 2
+
+    dist = 1/m * sum(abs(train1[i] - train2[i]) ** p for i in xrange(m)) ** (1/p)
+    return dist
