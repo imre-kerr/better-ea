@@ -7,6 +7,6 @@ def reproduction(parent_list, mutate, crossover):
         kids += [(kid, 0)]
     return kids
 
-def gen_reproducton(mutate, crossover):
+def gen_reproduction(mutate, crossover):
     '''Generate a reproduction function'''
-    return (lambda parent_list: reproduction(parent_list, mutate_crossover))
+    return (lambda parent_list: reproduction(parent_list, mutate, crossover))

@@ -11,12 +11,12 @@ def roulette(prob_list):
 
 def stochastic_uniform(population, litter_size):
     '''Choose parents with equal probability'''
-    return [random.choice(population)[0], random.choice(population)[0] for i in xrange(litter_size)]
+    return [(random.choice(population)[0], random.choice(population)[0]) for i in xrange(litter_size)]
     
 def fitness_proportionate(population, litter_size):
     '''Choose parents with probability proportional to their fitness'''
     fitness_list = [ind[2] for ind in population]
-    return [population[roulette(fitness_list)][0], population[roulette(fitness_list)][0] for i in xrange(litter_size)]
+    return [(population[roulette(fitness_list)][0], population[roulette(fitness_list)][0]) for i in xrange(litter_size)]
 
 def sigma_scaling(population, litter_size):
     '''Choose parents with probability proportional to their fitness, scaled by the population's standard deviation'''
@@ -27,7 +27,7 @@ def sigma_scaling(population, litter_size):
         scaled_fitness = [1 + (f - avg)/(2*sigma) for f in fitness_list]
     else:
         scaled_fitness = [1] * len(fitness_list)
-    return [population[roulette(fitness_list)][0], population[roulette(fitness_list)][0] for i in xrange(litter_size)]
+    return [(population[roulette(fitness_list)][0], population[roulette(fitness_list)][0]) for i in xrange(litter_size)]
 
 def tournament(population, litter_size, tournament_size):
     '''Choose parents by choosing the most fit individual from a tournament_size size random sample of the population'''
@@ -37,7 +37,7 @@ def tournament(population, litter_size, tournament_size):
         t2 = random.sample(population, tournament_size)
         p1 = max(t1, key=lambda ind: ind[2])
         p2 = max(t2, key=lambda ind: ind[2])
-        parents += (p1, p2)
+        parents += [(p1[0], p2[0])]
     return parents
 
 def gen_parent_selection(litter_size):
