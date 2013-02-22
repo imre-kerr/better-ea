@@ -35,12 +35,13 @@ def dist_spike_time(train1, train2):
     n = min(len(spikes1), len(spikes2))
     p = 2
     
-    dist = 1/n * sum(abs(spikes1[i] - spikes2[i])**p for i in xrange(n)) ** (1/p)
+    dist = sum(abs(spikes1[i] - spikes2[i])**p for i in xrange(n)) ** (1/p)
     
     # Note that m and n are reversed in relation to their names in izzy-evo.pdf
     m = max(len(train1), len(train2))
     penalty = (m - n) * len(train1) / (2 * n)
-    
+    dist = 1/n * (dist + penalty)
+
     return dist + penalty
 
 def dist_spike_interval(train1, train2):
@@ -51,13 +52,14 @@ def dist_spike_interval(train1, train2):
     n = min(len(spikes1), len(spikes2))
     p = 2
     
-    dist = 1/(n-1) * sum(abs((spikes1[i] - spikes1[i-1])-(spikes2[i] - spikes2[i-1]))**p for i in xrange(1,n)) ** (1/p)
+    dist = sum(abs((spikes1[i] - spikes1[i-1])-(spikes2[i] - spikes2[i-1]))**p for i in xrange(1,n)) ** (1/p)
     
     # Note that m and n are reversed in relation to their names in izzy-evo.pdf
     m = max(len(train1), len(train2))
-    penalty = (m - n) * len(train1) / (2 * n)
-    
-    return dist + penalty
+    penalty = (m - n) * len(train1) / (2 * n)    
+    dist = 1/(n-1) * (dist + penalty)
+
+    return dist
 
 def dist_waveform(train1, train2):
     '''Compute distance between two spike trains using the waveform distance metric'''
