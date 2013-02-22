@@ -16,14 +16,14 @@ def generational_mixing(population, n):
 def gen_adult_selection(popsize):
     '''Generate an adult selection function interactively'''
     while True:
-        method = raw_input("Input adult selection protocol (full/overproduction/mix): ")
+        method = raw_input("Input adult selection protocol (full/overproduction/mix):\n")
         if method == 'full':
             return full_generational_replacement, popsize
         elif method == 'overproduction':
-            litter_size = int(raw_input("Input litter size: "))
+            litter_size = int(raw_input("Input litter size:\n"))
             return (lambda population: overproduction(population, popsize)), litter_size
         elif method == 'mix':
-            litter_size = int(raw_input("Input litter size: "))
+            litter_size = int(raw_input("Input litter size:\n"))
             return (lambda population: generational_mixing(population, popsize)), litter_size
         else:
-            print "Unrecognized method: " + method
+            print "Unrecognized method: " + method + "\n"
