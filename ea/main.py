@@ -17,7 +17,7 @@ def evolutionary_algorithm(initial, development, fitness_test,
     for gen in xrange(generations):
         developed_population = development(genotypes) # developed_population: [(gtype, ptype, age) list]
         tested_population = fitness_test(developed_population) # tested_population: [(gtype, ptype, fitness, age) list]
-        culled_population = adult_selection(tested_population) # culled_population: [(gtype, ptype, fitness, age) list]            
+        culled_population = adult_selection(tested_population) # culled_population: [(gtype, ptype, fitness, age) list]
         generation_list += [culled_population]
         if done(culled_population, fitness_goal):
             break
