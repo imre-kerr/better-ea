@@ -15,3 +15,12 @@ def spiketrain(a, b, c, d, k, tau, ext_input, thresh, steps):
             v = c
             u = u + d
     return train
+
+def detect_spikes(spike_train, thresh, k):
+    '''Detect spikes in a spike train using a sliding window of size k'''
+    spikes = []
+    for i in xrange(len(spike_train) - k + 1):
+        window = spike_train[i:i+k]
+        if window[k/2] == max(window) and window[k/2] > thresh:
+            spikes += [k/2]
+    return spikes
