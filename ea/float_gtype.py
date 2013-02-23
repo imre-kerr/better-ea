@@ -24,8 +24,11 @@ def choice_crossover(gtype1, gtype2):
 
 def weighted_average_crossover(gtype1, gtype2):
     '''Cross two gtypes by taking a randomly weighted average of each value'''
-    return [gtype1[i] * rand + gtype2[i] * (1-rand) for i, rand in enumerate([random.random() for i in xrange(gtype1)])]
-
+    crossed = []
+    for i in xrange(len(gtype1)):
+        rand = random.random()
+        crossed += [gtype1[i]*rand + gtype2[i]*(1-rand)]
+    return crossed
 
 def gen_crossover():
     '''Generate a crossover function'''
