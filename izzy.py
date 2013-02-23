@@ -1,6 +1,6 @@
 from __future__ import division
 from ea import float_gtype
-from ea.named_tuples import *
+from ea.ea_globals import *
 
 def spiketrain(a, b, c, d, k,):
     '''Compute a spike train according to the Izhikevich model'''
@@ -108,6 +108,16 @@ def develop(population):
     for ind in population:
         developed += [gpa_t(gtype=ind.gtype, ptype=spiketrain_list(ind.gtype), age=ind.age)]
     return developed
+
+def visualize(generation_list):
+    '''Generate pretty pictures using matplotlib'''
+    best = []
+    average = []
+    average_plus_stddev = []
+    average_minus_stddev = []
+    for pop in generation_list:
+        
+        
     
 if __name__ == '__main__':
     popsize = int(raw_input("Input population size:\n"))

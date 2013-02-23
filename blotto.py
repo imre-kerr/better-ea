@@ -4,7 +4,7 @@ from ea import parent_selection
 from ea import reproduction
 from ea import main
 from ea import binary_gtype
-from ea.named_tuples import *
+from ea.ea_globals import *
 
 def war(p1_orig, p2_orig, reployment_factor, loss_factor):
     '''Fight a single war and return score for each side'''

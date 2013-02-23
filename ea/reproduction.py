@@ -1,4 +1,4 @@
-from named_tuples import *
+from ea_globals import *
 
 def reproduction(parent_list, mutate, crossover):
     '''Create a new population of gtypes by crossing and mutating each pair of input gtypes'''

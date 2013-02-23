@@ -3,7 +3,7 @@ from ea import parent_selection
 from ea import reproduction
 from ea import main
 from ea import binary_gtype
-from ea.named_tuples import *
+from ea.ea_globals import *
 
 def fitness_test(population):
     '''Naive fitness test for onemax, just the number of ones'''

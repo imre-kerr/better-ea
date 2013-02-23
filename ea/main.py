@@ -1,4 +1,4 @@
-from named_tuples import *
+from ea_globals import *
 
 def gen_mix(new, prev):
     '''Create the next generation by mixing children and adults, add 1 to adults' age'''

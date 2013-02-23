@@ -1,5 +1,5 @@
 from operator import attrgetter
-from named_tuples import *
+from ea_globals import *
 
 def full_generational_replacement(population):
     '''Cull all individuals that are more than 1 generation old'''

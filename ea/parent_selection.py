@@ -1,6 +1,6 @@
 from __future__ import division
 from bisect import bisect_left
-from named_tuples import *
+from ea_globals import *
 from operator import attrgetter
 import random
 import math
