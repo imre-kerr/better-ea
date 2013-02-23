@@ -71,18 +71,18 @@ if __name__=='__main__':
     popsize = int(raw_input("Input population size:\n"))
     reployment_factor = float(raw_input("Input reployment factor:\n"))
     loss_factor = float(raw_input("Input loss factor:\n"))
-    adult_selection, litter_size = adult_selection.gen_adult_selection(popsize)
-    parent_selection = parent_selection.gen_parent_selection(litter_size)
+    adult_selector, litter_size = adult_selection.gen_adult_selection(popsize)
+    parent_selector = parent_selection.gen_parent_selection(litter_size)
 
     mutate = binary_gtype.gen_mutate()
     crossover = binary_gtype.gen_crossover()
-    reproduction = reproduction.gen_reproduction(mutate, crossover)
+    reproducer = reproduction.gen_reproduction(mutate, crossover)
 
     generations = int(input("Input max number of generations:\n"))
     fitness_goal = 0
 
     initial = [ga_t(gtype=binary_gtype.generate(4*battles), age=0) for i in xrange(popsize)]
     dec_fitness_test = lambda population: fitness_test(population, reployment_factor, loss_factor)
-    generation_list = main.evolutionary_algorithm(initial, develop, dec_fitness_test, adult_selection, parent_selection, reproduction, generations, fitness_goal)
+    generation_list = main.evolutionary_algorithm(initial, develop, dec_fitness_test, adult_selector, parent_selector, reproducer, generations, fitness_goal)
 
     visualize(generation_list)
