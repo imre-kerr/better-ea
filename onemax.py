@@ -3,14 +3,21 @@ from ea import parent_selection
 from ea import reproduction
 from ea import main
 from ea import binary_gtype
+from ea.named_tuples import *
 
 def fitness_test(population):
     '''Naive fitness test for onemax, just the number of ones'''
-    return [(ind[0], ind[1], sum(ind[1]), ind[2]) for ind in population]
+    tested = []
+    for ind in population:
+        tested += [gpfa_t(gtype=ind.gtype, ptype=ind.ptype, fitness=sum(ind.ptype), age=ind.age)]
+    return tested
 
 def develop(population):
     '''Development function for onemax (just copies the genotype)'''
-    return [(ind[0], list(ind[0]), ind[1]) for ind in population]
+    developed = []
+    for ind in population:
+        developed += [gpa_t(gtype=ind.gtype, ptype=list(ind.gtype), age=ind.age)]
+    return developed
 
 def visualize(generation_list):
     '''Generate visualizations using matplotlib'''
@@ -30,7 +37,7 @@ if __name__=='__main__':
     generations = int(input("Input max number of generations:\n"))
     fitness_goal = float(input("Input fitness goal, 0 for none:\n"))
 
-    initial = [(binary_gtype.generate(size), 0) for i in xrange(popsize)]
+    initial = [ga_t(gtype=binary_gtype.generate(size), age=0) for i in xrange(popsize)]
     generation_list = main.evolutionary_algorithm(initial, develop, fitness_test, adult_selection, parent_selection, reproduction, generations, fitness_goal)
 
     print "Program ran for " + str(len(generation_list)) + " generations"

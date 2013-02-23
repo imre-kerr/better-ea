@@ -1,10 +1,12 @@
+from named_tuples import *
+
 def reproduction(parent_list, mutate, crossover):
     '''Create a new population of gtypes by crossing and mutating each pair of input gtypes'''
     kids = []
     for mom, dad in parent_list:
         kid = crossover(mom, dad)
         kid = mutate(kid)
-        kids += [(kid, 0)]
+        kids += [ga_t(gtype=kid, age=0)]
     return kids
 
 def gen_reproduction(mutate, crossover):

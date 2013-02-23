@@ -1,5 +1,7 @@
 from __future__ import division
 from bisect import bisect_left
+from named_tuples import *
+from operator import attrgetter
 import random
 import math
 
@@ -12,23 +14,34 @@ def roulette(prob_list):
 
 def stochastic_uniform(population, litter_size):
     '''Choose parents with equal probability'''
-    return [(random.choice(population)[0], random.choice(population)[0]) for i in xrange(litter_size)]
+    return [(random.choice(population).gtype, random.choice(population).gtype) for i in xrange(litter_size)]
     
 def fitness_proportionate(population, litter_size):
     '''Choose parents with probability proportional to their fitness'''
-    fitness_list = [ind[2] for ind in population]
-    return [(population[roulette(fitness_list)][0], population[roulette(fitness_list)][0]) for i in xrange(litter_size)]
+    fitness_list = [ind.fitness for ind in population]
+    gtype_list = [ind.gtype for ind in population]
+
+    parents = []
+    for i in xrange(litter_size):
+        parents += [(gtype_list[roulette(fitness_list)], gtype_list[roulette(fitness_list)])]
+    return parents
 
 def sigma_scaling(population, litter_size):
     '''Choose parents with probability proportional to their fitness, scaled by the population's standard deviation'''
-    fitness_list = [ind[2] for ind in population]
+    fitness_list = [ind.fitness for ind in population]
+    gtype_list = [ind.gtype for ind in population]
     avg = sum(fitness_list) / len(fitness_list)
     sigma = math.sqrt(sum([(f - avg)**2 for f in fitness_list]))
+
     if sigma != 0:
         scaled_fitness = [1 + (f - avg)/(2*sigma) for f in fitness_list]
     else:
         scaled_fitness = [1] * len(fitness_list)
-    return [(population[roulette(fitness_list)][0], population[roulette(fitness_list)][0]) for i in xrange(litter_size)]
+
+    parents = []
+    for i in xrange(litter_size):
+        parents += [(gtype_list[roulette(fitness_list)], gtype_list[roulette(fitness_list)])]
+    return parents
 
 def tournament(population, litter_size, tournament_size):
     '''Choose parents by choosing the most fit individual from a tournament_size size random sample of the population'''
@@ -36,9 +49,9 @@ def tournament(population, litter_size, tournament_size):
     for i in xrange(litter_size):
         t1 = random.sample(population, tournament_size)
         t2 = random.sample(population, tournament_size)
-        p1 = max(t1, key=lambda ind: ind[2])
-        p2 = max(t2, key=lambda ind: ind[2])
-        parents += [(p1[0], p2[0])]
+        p1 = max(t1, key=attrgetter('fitness'))
+        p2 = max(t2, key=attrgetter('fitness'))
+        parents += [(p1.gtype, p2.gtype)]
     return parents
 
 def gen_parent_selection(litter_size):

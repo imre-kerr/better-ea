@@ -4,6 +4,7 @@ from ea import parent_selection
 from ea import reproduction
 from ea import main
 from ea import binary_gtype
+from ea.named_tuples import *
 
 def war(p1_orig, p2_orig, reployment_factor, loss_factor):
     '''Fight a single war and return score for each side'''
@@ -37,23 +38,27 @@ def fitness_test(population, reployment_factor, loss_factor):
     '''Blotto fitness test, a.k.a. the great war'''
     warscores = [[0] for i in xrange(len(population))]
     for i in xrange(len(population)):
-        for j in xrange(1+1, len(population)):
-            score1, score2 = war(population[i][1], population[j][1], reployment_factor, loss_factor)
+        for j in xrange(i+1, len(population)):
+            score1, score2 = war(population[i].ptype, population[j].ptype, reployment_factor, loss_factor)
             warscores[i] += [score1]
             warscores[j] += [score2]
-    return [(ind[0], ind[1], warscores[i], ind[2]) for i, ind in enumerate(population)]
-            
+    
+    tested = []
+    for i, ind in enumerate(population):
+        tested += [gpfa_t(gtype=ind.gtype, ptype=ind.ptype, fitness=warscores[i], age=ind.age)]
+    return tested
 
 def develop(population):
     '''Development function for blotto. 
     Interpret groups of four bits as numbers, then normalize them so they sum to 1.0'''
     developed = []
     for ind in population:
+        gtype = ind.gtype
         intlist = []
-        for i in xrange(0, len(ind[0]), 4):
-            intlist += [ind[0][i] * 8 + ind[0][i+1] * 4 + ind[0][i+2] * 2 + ind[0][i+3]]
+        for i in xrange(0, len(gtype), 4):
+            intlist += [gtype[i] * 8 + gtype[i+1] * 4 + gtype[i+2] * 2 + gtype[i+3]]
         floatlist = [x / sum(intlist) for x in intlist]
-        developed += [(ind[0], floatlist, ind[1])]
+        developed += [gpa_t(gtype=gtype, ptype=floatlist, age=ind.age)]
     return developed
 
 
@@ -76,7 +81,7 @@ if __name__=='__main__':
     generations = int(input("Input max number of generations:\n"))
     fitness_goal = 0
 
-    initial = [(binary_gtype.generate(4*battles), 0) for i in xrange(popsize)]
+    initial = [ga_t(gtype=binary_gtype.generate(4*battles), age=0) for i in xrange(popsize)]
     dec_fitness_test = lambda population: fitness_test(population, reployment_factor, loss_factor)
     generation_list = main.evolutionary_algorithm(initial, develop, dec_fitness_test, adult_selection, parent_selection, reproduction, generations, fitness_goal)
 

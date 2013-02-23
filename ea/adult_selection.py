@@ -1,16 +1,19 @@
+from operator import attrgetter
+from named_tuples import *
+
 def full_generational_replacement(population):
     '''Cull all individuals that are more than 1 generation old'''
-    return [ind for ind in population if ind[3] == 0]
+    return [ind for ind in population if ind.age == 0]
 
 def overproduction(population, n):
     '''Cull all but the n most fit individuals that are no more than 1 generation old'''
-    newpop = [ind for ind in population if ind[3] == 0]
-    newpop.sort(key=(lambda ind: ind[2]), reverse=True)
+    newpop = [ind for ind in population if ind.age == 0]
+    newpop.sort(key=attrgetter('fitness'), reverse=True)
     return [ind for ind in newpop[:n]]
 
 def generational_mixing(population, n):
     '''Cull all but the n most fit individuals'''
-    newpop = sorted(population, key=(lambda ind: ind[2]), reverse=True)
+    newpop = sorted(population, key=attrgetter('fitness'), reverse=True)
     return [ind for ind in newpop[:n]]
 
 def gen_adult_selection(popsize):

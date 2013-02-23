@@ -1,10 +1,12 @@
+from named_tuples import *
+
 def gen_mix(new, prev):
     '''Create the next generation by mixing children and adults, add 1 to adults' age'''
-    return new + [(individual[0], individual[3] + 1) for individual in prev]
+    return new + [ga_t(gtype=individual.gtype, age=individual.age + 1) for individual in prev]
     
 def done(pop, goal):
     '''Check if the highest fitness in the population is >= the fitness goal'''
-    return max([ind[2] for ind in pop]) >= goal
+    return max([ind.fitness for ind in pop]) >= goal
 
 def evolutionary_algorithm(initial, development, fitness_test, 
                            adult_selection, parent_selection, 
