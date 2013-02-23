@@ -1,6 +1,12 @@
 from __future__ import division
 from ea import float_gtype
+from ea import adult_selection
+from ea import parent_selection
+from ea import reproduction
+from ea import main
 from ea.ea_globals import *
+import pylab
+import sys
 
 def spiketrain(a, b, c, d, k,):
     '''Compute a spike train according to the Izhikevich model'''
@@ -26,7 +32,7 @@ def spiketrain(a, b, c, d, k,):
 
 def spiketrain_list(params):
     '''Take a, b, c, d and k as a list and compute the corresponding spike train'''
-    return spiketrain(params[0], params[1], params[2], params[3], params[4], params[5])
+    return spiketrain(params[0], params[1], params[2], params[3], params[4])
 
 def detect_spikes(spike_train):
     '''Detect spikes in a spike train using a sliding window of size k'''
@@ -35,8 +41,8 @@ def detect_spikes(spike_train):
     spikes = []
     for i in xrange(len(spike_train) - k + 1):
         window = spike_train[i:i+k]
-        if window[k/2] == max(window) and window[k/2] > thresh:
-            spikes += [window[k/2]]
+        if window[k//2] == max(window) and window[k//2] > thresh:
+            spikes += [window[k//2]]
     return spikes
 
 def dist_spike_time(train1, train2):
@@ -51,7 +57,13 @@ def dist_spike_time(train1, train2):
     
     # Note that m and n are reversed in relation to their names in izzy-evo.pdf
     m = max(len(train1), len(train2))
-    penalty = (m - n) * len(train1) / (2 * n)
+    if n > 0:
+        penalty = (m - n) * len(train1) / (2 * n)
+    else:
+        if m > 0:
+            penalty = Inf
+        else:
+            penalty = 0
     dist = 1/n * (dist + penalty)
 
     return dist + penalty
@@ -109,31 +121,66 @@ def develop(population):
         developed += [gpa_t(gtype=ind.gtype, ptype=spiketrain_list(ind.gtype), age=ind.age)]
     return developed
 
-def visualize(generation_list):
-    '''Generate pretty pictures using matplotlib'''
+def visualize(generation_list, target):
+    '''Generate pretty pictures using pylab'''
     best = []
     average = []
+    stddev = []
     average_plus_stddev = []
     average_minus_stddev = []
     for pop in generation_list:
-        
-        
+        best += [most_fit(pop).fitness]
+        average += [avg_fitness(pop)]
+        stddev += [fitness_stddev(pop)] 
+        average_plus_stddev += [average[-1] + stddev[-1]]
+        average_minus_stddev += [average[-1] - stddev[-1]]
     
+    pylab.figure(1)
+    pylab.fill_between(range(len(generation_list)), average_plus_stddev, average_minus_stddev, alpha=0.2, color='b', label="Standard deviation")
+    pylab.plot(range(len(generation_list)), best, color='r', label='Best')
+    pylab.plot(range(len(generation_list)), average, color='r', label='Average with std.dev.')
+    pylab.title("Fitness plot - Izzy")
+    pylab.xlabel("Generation")
+    pylab.ylabel("Fitness")
+    pylab.legend(loc="upper left")
+    pylab.savefig("izzy_fitness.png")
+
+    best_index = best.index(max(best))
+    best_individual = most_fit(generation_list[best_index])
+    best_spiketrain = best_individual.ptype
+
+    pylab.figure(2)
+    pylab.plot(range(len(best_spiketrain)), best_spiketrain, color='r', label='Best solution')
+    pylab.plot(range(len(target)), target, color='blue', label='Target')
+    pylab.title("Spiketrain plot")
+    pylab.xlabel("Time - t")
+    pylab.ylabel("Activation level - v")
+    pylab.legend(loc="upper right")
+    pylab.savefig("izzy_spiketrains.png")
+
 if __name__ == '__main__':
+    if len(sys.argv) == 1:
+        print "Error: No filename given"
+        sys.exit()
+
+    target_file = open(sys.argv[1])
+    target_spiketrain = [float(num) for num in target_file.read().split()]
+
+    ranges = [(0.001, 0.2), (0.01, 0.3), (-80, -30), (0.1, 10), (0.01, 1)]
+
     popsize = int(raw_input("Input population size:\n"))
-    target_file = # TODO: Read from file and whatnot
-    fitness_tester = gen_fitness(target_file)
+    fitness_tester = gen_fitness(target_spiketrain)
     adult_selector, litter_size = adult_selection.gen_adult_selection(popsize)
     parent_selector = parent_selection.gen_parent_selection(litter_size)
     
-    mutate = float_gtype.gen_mutate()
+    mutate = float_gtype.gen_mutate(ranges)
     crossover = float_gtype.gen_crossover()
     reproducer = reproduction.gen_reproduction(mutate, crossover)
 
     generations = int(raw_input("Input max number of generations:\n"))
     fitness_goal = float(raw_input("Input fitness goal, 0 for none:\n"))
 
-    ranges = [(0.001, 0.2), (0.01, 0.3), (-80, -30), (0.1, 10), (0.01, 1)]
     initial = [ga_t(gtype=float_gtype.generate(ranges), age=0)]
     generation_list = main.evolutionary_algorithm(initial, develop, fitness_tester, adult_selector, parent_selector, reproducer, generations, fitness_goal)
 
+    visualize(generation_list, target_spiketrain)

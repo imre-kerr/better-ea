@@ -1,3 +1,5 @@
+import random
+
 def generate(ranges):
     '''Generate a random float gtype based on ranges ((high, low) list)'''
     return [random.uniform(high, low) for high, low in ranges]
@@ -5,7 +7,7 @@ def generate(ranges):
 def mutate_gaussian(gtype, ranges, prob, sigma):
     '''Mutate a gtype by adding gaussian random values. Results are clipped to fit range.'''
     mutated = list(gtype)
-    for i in in xrange(len(mutated)):
+    for i in xrange(len(mutated)):
         if random.random < prob:
             mutated[i] += random.gauss(0, sigma) * (ranges[i][1] - ranges[i][0])
             mutated[i] = max(mutated[i], ranges[i][0])

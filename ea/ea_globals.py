@@ -1,6 +1,7 @@
 from __future__ import division
 from collections import namedtuple
 from operator import attrgetter
+import math
 
 ga_t   = namedtuple('ga_t', ['gtype', 'age'])
 gpa_t  = namedtuple('gpa_t', ['gtype', 'ptype', 'age'])
@@ -17,4 +18,4 @@ def avg_fitness(population):
 def fitness_stddev(population):
     '''Return the standard deviation of the fitnesses in the population'''
     avg = avg_fitness(population)
-    
+    return math.sqrt(sum((ind.fitness - avg)**2 for ind in population))
