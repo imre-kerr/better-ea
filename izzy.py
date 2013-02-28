@@ -42,7 +42,7 @@ def detect_spikes(spike_train):
     for i in xrange(len(spike_train) - k + 1):
         window = spike_train[i:i+k]
         if window[k//2] == max(window) and window[k//2] > thresh:
-            spikes += [window[k//2]]
+            spikes += [k//2]
     return spikes
 
 def dist_spike_time(train1, train2):
@@ -59,12 +59,9 @@ def dist_spike_time(train1, train2):
     m = max(len(train1), len(train2))
     if n > 0:
         penalty = (m - n) * len(train1) / (2 * n)
-    else:
-        if m > 0:
-            penalty = Inf
-        else:
-            penalty = 0
-    dist = 1/n * (dist + penalty)
+        dist = 1/n * (dist + penalty)
+    elif m > 0:
+        penalty = float('Inf')
 
     return dist + penalty
 
@@ -80,9 +77,11 @@ def dist_spike_interval(train1, train2):
     
     # Note that m and n are reversed in relation to their names in izzy-evo.pdf
     m = max(len(train1), len(train2))
-    penalty = (m - n) * len(train1) / (2 * n)    
-    dist = 1/(n-1) * (dist + penalty)
-
+    if n > 1:
+        penalty = (m - n) * len(train1) / (2 * n)    
+        dist = 1/(n-1) * (dist + penalty)
+    elif m > 1:
+        dist = float('Inf')
     return dist
 
 def dist_waveform(train1, train2):
@@ -121,8 +120,16 @@ def develop(population):
         developed += [gpa_t(gtype=ind.gtype, ptype=spiketrain_list(ind.gtype), age=ind.age)]
     return developed
 
+def print_gtypes(generation_list):
+    for gen in generation_list:
+        print 'hurr'
+        for ind in gen:
+            print ind.gtype    
+
 def visualize(generation_list, target):
     '''Generate pretty pictures using pylab'''
+#    print_gtypes(generation_list)
+
     best = []
     average = []
     stddev = []
@@ -138,7 +145,7 @@ def visualize(generation_list, target):
     pylab.figure(1)
     pylab.fill_between(range(len(generation_list)), average_plus_stddev, average_minus_stddev, alpha=0.2, color='b', label="Standard deviation")
     pylab.plot(range(len(generation_list)), best, color='r', label='Best')
-    pylab.plot(range(len(generation_list)), average, color='r', label='Average with std.dev.')
+    pylab.plot(range(len(generation_list)), average, color='b', label='Average with std.dev.')
     pylab.title("Fitness plot - Izzy")
     pylab.xlabel("Generation")
     pylab.ylabel("Fitness")
@@ -166,7 +173,7 @@ if __name__ == '__main__':
     target_file = open(sys.argv[1])
     target_spiketrain = [float(num) for num in target_file.read().split()]
 
-    ranges = [(0.001, 0.2), (0.01, 0.3), (-80, -30), (0.1, 10), (0.01, 1)]
+    ranges = [(0.001, 0.2), (0.01, 0.3), (-80.0, -30.0), (0.1, 10.0), (0.01, 1.0)]
 
     popsize = int(raw_input("Input population size:\n"))
     fitness_tester = gen_fitness(target_spiketrain)
@@ -180,7 +187,7 @@ if __name__ == '__main__':
     generations = int(raw_input("Input max number of generations:\n"))
     fitness_goal = float(raw_input("Input fitness goal, 0 for none:\n"))
 
-    initial = [ga_t(gtype=float_gtype.generate(ranges), age=0)]
+    initial = [ga_t(gtype=float_gtype.generate(ranges), age=0) for i in xrange(popsize)]
     generation_list = main.evolutionary_algorithm(initial, develop, fitness_tester, adult_selector, parent_selector, reproducer, generations, fitness_goal)
 
     visualize(generation_list, target_spiketrain)

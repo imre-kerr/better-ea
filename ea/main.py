@@ -21,7 +21,7 @@ def evolutionary_algorithm(initial, development, fitness_test,
         tested_population = fitness_test(developed_population) # tested_population: [(gtype, ptype, fitness, age) list]
         culled_population = adult_selection(tested_population) # culled_population: [(gtype, ptype, fitness, age) list]
         generation_list += [culled_population]
-        if done(culled_population, fitness_goal):
+        if fitness_goal != 0 and done(culled_population, fitness_goal):
             break
         # TODO: Uncomment this if Pauline wills it. Also use retested_population in next line.
         # retested_population = fitness_test(culled_population) # retested_population: [(gtype, ptype, fitness, age) list]

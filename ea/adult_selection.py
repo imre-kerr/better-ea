@@ -14,7 +14,7 @@ def overproduction(population, n):
 def generational_mixing(population, n):
     '''Cull all but the n most fit individuals'''
     newpop = sorted(population, key=attrgetter('fitness'), reverse=True)
-    return [ind for ind in newpop[:n]]
+    return newpop[:n]
 
 def gen_adult_selection(popsize):
     '''Generate an adult selection function interactively'''

@@ -8,7 +8,7 @@ def mutate_gaussian(gtype, ranges, prob, sigma):
     '''Mutate a gtype by adding gaussian random values. Results are clipped to fit range.'''
     mutated = list(gtype)
     for i in xrange(len(mutated)):
-        if random.random < prob:
+        if random.random() < prob:
             mutated[i] += random.gauss(0, sigma) * (ranges[i][1] - ranges[i][0])
             mutated[i] = max(mutated[i], ranges[i][0])
             mutated[i] = min(mutated[i], ranges[i][1])
@@ -19,6 +19,7 @@ def gen_mutate(ranges):
     prob = float(raw_input("Input per-number mutation chance:\n"))
     sigma = float(raw_input("Input standard deviation for mutations:\n"))
     return (lambda gtype: mutate_gaussian(gtype, ranges, prob, sigma))
+
 
 def choice_crossover(gtype1, gtype2):
     '''Cross two gtypes by randomly selecting elements from one or the other'''
