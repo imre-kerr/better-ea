@@ -125,6 +125,12 @@ def develop(population):
         developed += [gpa_t(gtype=ind.gtype, ptype=spiketrain_list(ind.gtype), age=ind.age)]
     return developed
 
+def develop_mp(population):
+    '''Development function that makes use of multiprocessing'''
+    pool = mp.Pool(mp.cpu_count())
+    ptype_list = pool.map(spiketrain_list, [ind.gtype for ind in population])
+    return [gpa_t(gtype=ind.gtype, ptype=ptype_list[i], age=ind.age ) for i, ind in enumerate(population)]
+
 def visualize(generation_list, target):
     '''Generate pretty pictures using pylab'''
     best = []
