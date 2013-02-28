@@ -7,6 +7,7 @@ from ea import main
 from ea.ea_globals import *
 import pylab
 import sys
+import multiprocessing as mp
 
 def spiketrain(a, b, c, d, k,):
     '''Compute a spike train according to the Izhikevich model'''
@@ -42,28 +43,32 @@ def detect_spikes(spike_train):
     for i in xrange(len(spike_train) - k + 1):
         window = spike_train[i:i+k]
         if window[k//2] == max(window) and window[k//2] > thresh:
-            spikes += [k//2]
+            spikes += [i + k//2]
     return spikes
 
 def dist_spike_time(train1, train2):
     '''Compute distance between two spike trains using the spike time distance metric'''
     spikes1 = detect_spikes(train1)
     spikes2 = detect_spikes(train2)
-    
-    n = min(len(spikes1), len(spikes2))
-    p = 2
-    
-    dist = sum(abs(spikes1[i] - spikes2[i])**p for i in xrange(n)) ** (1/p)
-    
-    # Note that m and n are reversed in relation to their names in izzy-evo.pdf
-    m = max(len(train1), len(train2))
-    if n > 0:
-        penalty = (m - n) * len(train1) / (2 * n)
-        dist = 1/n * (dist + penalty)
-    elif m > 0:
-        penalty = float('Inf')
 
-    return dist + penalty
+    m = min(len(spikes1), len(spikes2))
+    n = max(len(spikes1), len(spikes2))
+
+    p = 2
+
+    dist = 0
+    for i in xrange(m):
+        dist += abs(spikes1[i] - spikes2[i])**p
+    dist = dist ** (1/p)
+    
+    penalty = (n-m)*len(train1)
+    if m > 0:
+        penalty = penalty / (2*m)
+    else:
+        penalty = float('Inf')
+    dist = (1/n) * (dist + penalty)
+
+    return dist
 
 def dist_spike_interval(train1, train2):
     '''Compute distance between two spike trains using the spike interval distance metric'''
@@ -92,7 +97,7 @@ def dist_waveform(train1, train2):
     dist = 1/m * sum(abs(train1[i] - train2[i]) ** p for i in xrange(m)) ** (1/p)
     return dist
 
-def fitness_test(population, target , dist):
+def fitness_test(population, target, dist):
     '''Compute fitnesses based on distance to the target spike train'''
     tested = []
     for ind in population:
@@ -120,16 +125,8 @@ def develop(population):
         developed += [gpa_t(gtype=ind.gtype, ptype=spiketrain_list(ind.gtype), age=ind.age)]
     return developed
 
-def print_gtypes(generation_list):
-    for gen in generation_list:
-        print 'hurr'
-        for ind in gen:
-            print ind.gtype    
-
 def visualize(generation_list, target):
     '''Generate pretty pictures using pylab'''
-#    print_gtypes(generation_list)
-
     best = []
     average = []
     stddev = []

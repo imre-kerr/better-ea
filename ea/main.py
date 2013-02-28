@@ -33,4 +33,5 @@ def evolutionary_algorithm(initial, development, fitness_test,
         offspring = reproduction(parents) # offspring: [(gtype, age) list] (age = 0)
         genotypes = gen_mix(offspring, culled_population)
         stdout.write('\b'*len(generation_s))
+    print ""
     return generation_list
