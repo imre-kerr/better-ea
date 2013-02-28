@@ -1,4 +1,5 @@
 from ea_globals import *
+from sys import stdout
 
 def gen_mix(new, prev):
     '''Create the next generation by mixing children and adults, add 1 to adults' age'''
@@ -16,7 +17,10 @@ def evolutionary_algorithm(initial, development, fitness_test,
     Return a list of all generations, each a list of (gtype, ptype, fitness) touples'''
     generation_list = [] # generation_list: [[(gtype, ptype, fitness) list] list]
     genotypes = initial # genotypes: [(gtype, age) list]
+    stdout.write("\nProgress: generation ")
     for gen in xrange(generations):
+        generation_s = str(gen)
+        stdout.write(generation_s)
         developed_population = development(genotypes) # developed_population: [(gtype, ptype, age) list]
         tested_population = fitness_test(developed_population) # tested_population: [(gtype, ptype, fitness, age) list]
         culled_population = adult_selection(tested_population) # culled_population: [(gtype, ptype, fitness, age) list]
@@ -28,4 +32,5 @@ def evolutionary_algorithm(initial, development, fitness_test,
         parents = parent_selection(culled_population) # parents: [(gtype1, gtype2) list]
         offspring = reproduction(parents) # offspring: [(gtype, age) list] (age = 0)
         genotypes = gen_mix(offspring, culled_population)
+        stdout.write('\b'*len(generation_s))
     return generation_list
