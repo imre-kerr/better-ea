@@ -129,7 +129,9 @@ def develop_mp(population):
     '''Development function that makes use of multiprocessing'''
     pool = mp.Pool(mp.cpu_count())
     ptype_list = pool.map(spiketrain_list, [ind.gtype for ind in population])
-    return [gpa_t(gtype=ind.gtype, ptype=ptype_list[i], age=ind.age ) for i, ind in enumerate(population)]
+    developed = [gpa_t(gtype=ind.gtype, ptype=ptype_list[i], age=ind.age ) for i, ind in enumerate(population)]
+    pool.close()
+    return developed
 
 def visualize(generation_list, target):
     '''Generate pretty pictures using pylab'''
@@ -191,6 +193,6 @@ if __name__ == '__main__':
     fitness_goal = float(raw_input("Input fitness goal, 0 for none:\n"))
 
     initial = [ga_t(gtype=float_gtype.generate(ranges), age=0) for i in xrange(popsize)]
-    generation_list = main.evolutionary_algorithm(initial, develop, fitness_tester, adult_selector, parent_selector, reproducer, generations, fitness_goal)
+    generation_list = main.evolutionary_algorithm(initial, develop_mp, fitness_tester, adult_selector, parent_selector, reproducer, generations, fitness_goal)
 
     visualize(generation_list, target_spiketrain)
