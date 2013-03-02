@@ -72,15 +72,15 @@ def dist_spike_interval(train1, train2):
     spikes1 = detect_spikes(train1)
     spikes2 = detect_spikes(train2)
     
-    m = min(len(spikes1), len(spikes2))
-    n = max(len(train1), len(train2))   
+    n = min(len(spikes1), len(spikes2))
+    m = max(len(spikes1), len(spikes2))
     p = 2
     
     dist = sum(abs((spikes1[i] - spikes1[i-1])-(spikes2[i] - spikes2[i-1]))**p for i in xrange(1,m)) ** (1/p)
     
-
     penalty = (n - m) * len(train1) / max(2*m, 1)    
     dist = 1/max(m-1, 1) * (dist + penalty)
+
     return dist
 
 def dist_waveform(train1, train2):
@@ -95,7 +95,11 @@ def fitness_test(population, target, dist):
     '''Compute fitnesses based on distance to the target spike train'''
     tested = []
     for ind in population:
-        fitness = 1 / dist(ind.ptype, target)
+        distance = dist(ind.ptype, target)
+        if distance != 0:
+            fitness = 1 / dist(ind.ptype, target)
+        else:
+            fitness = float('Inf')
         tested += [gpfa_t(gtype=ind.gtype, ptype=ind.ptype, fitness=fitness, age=ind.age)]
     return tested
 
@@ -155,6 +159,8 @@ def visualize(generation_list, target):
     best_index = best.index(max(best))
     best_individual = most_fit(generation_list[best_index])
     best_spiketrain = best_individual.ptype
+
+    print best_individual.gtype
 
     pylab.figure(2)
     pylab.plot(range(len(best_spiketrain)), best_spiketrain, color='r', label='Best solution')
