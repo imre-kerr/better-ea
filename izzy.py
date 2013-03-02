@@ -72,15 +72,15 @@ def dist_spike_interval(train1, train2):
     spikes1 = detect_spikes(train1)
     spikes2 = detect_spikes(train2)
     
-    n = min(len(spikes1), len(spikes2))
+    m = min(len(spikes1), len(spikes2))
+    n = max(len(train1), len(train2))   
     p = 2
     
-    dist = sum(abs((spikes1[i] - spikes1[i-1])-(spikes2[i] - spikes2[i-1]))**p for i in xrange(1,n)) ** (1/p)
+    dist = sum(abs((spikes1[i] - spikes1[i-1])-(spikes2[i] - spikes2[i-1]))**p for i in xrange(1,m)) ** (1/p)
     
-    # Note that m and n are reversed in relation to their names in izzy-evo.pdf
-    m = max(len(train1), len(train2))
-    penalty = (m - n) * len(train1) / max(2*n, 1)    
-    dist = 1/max(n-1, 1) * (dist + penalty)
+
+    penalty = (n - m) * len(train1) / max(2*m, 1)    
+    dist = 1/max(m-1, 1) * (dist + penalty)
     return dist
 
 def dist_waveform(train1, train2):
