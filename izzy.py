@@ -62,10 +62,7 @@ def dist_spike_time(train1, train2):
     dist = dist ** (1/p)
     
     penalty = (n-m)*len(train1)
-    if m > 0:
-        penalty = penalty / (2*m)
-    else:
-        penalty = float('Inf')
+    penalty = penalty / max(2*m, 1)
     dist = (1/n) * (dist + penalty)
 
     return dist
@@ -82,11 +79,8 @@ def dist_spike_interval(train1, train2):
     
     # Note that m and n are reversed in relation to their names in izzy-evo.pdf
     m = max(len(train1), len(train2))
-    if n > 1:
-        penalty = (m - n) * len(train1) / (2 * n)    
-        dist = 1/(n-1) * (dist + penalty)
-    elif m > 1:
-        dist = float('Inf')
+    penalty = (m - n) * len(train1) / max(2*n, 1)    
+    dist = 1/max(n-1, 1) * (dist + penalty)
     return dist
 
 def dist_waveform(train1, train2):
@@ -131,6 +125,7 @@ def develop_mp(population):
     ptype_list = pool.map(spiketrain_list, [ind.gtype for ind in population])
     developed = [gpa_t(gtype=ind.gtype, ptype=ptype_list[i], age=ind.age ) for i, ind in enumerate(population)]
     pool.close()
+    pool.join()
     return developed
 
 def visualize(generation_list, target):
