@@ -7,6 +7,7 @@ from ea import main
 from ea.ea_globals import *
 import pylab
 import sys
+import copy
 import multiprocessing as mp
 
 def spiketrain(a, b, c, d, k,):
@@ -93,14 +94,15 @@ def dist_waveform(train1, train2):
 
 def fitness_test(population, target, dist):
     '''Compute fitnesses based on distance to the target spike train'''
-    tested = []
-    for ind in population:
+    tested = population
+    for ind in tested:
+        if ind.fitness != None:
+            continue
         distance = dist(ind.ptype, target)
         if distance != 0:
-            fitness = 1 / dist(ind.ptype, target)
+            ind.fitness = 1 / dist(ind.ptype, target)
         else:
-            fitness = float('Inf')
-        tested += [gpfa_t(gtype=ind.gtype, ptype=ind.ptype, fitness=fitness, age=ind.age)]
+            ind.fitness = float('Inf')
     return tested
 
 def gen_fitness(target):
@@ -118,16 +120,26 @@ def gen_fitness(target):
 
 def develop(population):
     '''Development function, generates spike train for each individual'''
-    developed = []
-    for ind in population:
-        developed += [gpa_t(gtype=ind.gtype, ptype=spiketrain_list(ind.gtype), age=ind.age)]
+    developed = population    
+    for ind in developed:
+        if ind.ptype != None:
+            continue
+        ind.ptype = spiketrain_list(ind.gtype)
     return developed
 
 def develop_mp(population):
     '''Development function that makes use of multiprocessing'''
+    developed = population
+    ptypes = []
+    indices = []
     pool = mp.Pool(mp.cpu_count())
-    ptype_list = pool.map(spiketrain_list, [ind.gtype for ind in population])
-    developed = [gpa_t(gtype=ind.gtype, ptype=ptype_list[i], age=ind.age ) for i, ind in enumerate(population)]
+    for i, ind in enumerate(developed):
+        if ind.ptype != None:
+            continue
+        indices += [i]
+        ptypes += [pool.apply_async(spiketrain_list, [ind.gtype])]
+    for i, worker in enumerate(ptypes):
+        population[indices[i]].ptype = worker.get()
     pool.close()
     pool.join()
     return developed
@@ -193,7 +205,7 @@ if __name__ == '__main__':
     generations = int(raw_input("Input max number of generations:\n"))
     fitness_goal = float(raw_input("Input fitness goal, 0 for none:\n"))
 
-    initial = [ga_t(gtype=float_gtype.generate(ranges), age=0) for i in xrange(popsize)]
+    initial = [individual(gtype=float_gtype.generate(ranges), age=0) for i in xrange(popsize)]
     generation_list = main.evolutionary_algorithm(initial, develop_mp, fitness_tester, adult_selector, parent_selector, reproducer, generations, fitness_goal)
 
     visualize(generation_list, target_spiketrain)

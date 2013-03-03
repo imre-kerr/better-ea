@@ -1,9 +1,12 @@
 from ea_globals import *
 from sys import stdout
+import copy
 
 def gen_mix(new, prev):
     '''Create the next generation by mixing children and adults, add 1 to adults' age'''
-    return new + [ga_t(gtype=individual.gtype, age=individual.age + 1) for individual in prev]
+    for ind in prev:
+        ind.age += 1
+    return new + prev
     
 def done(pop, goal):
     '''Check if the highest fitness in the population is >= the fitness goal'''

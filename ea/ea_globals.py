@@ -3,9 +3,16 @@ from collections import namedtuple
 from operator import attrgetter
 import math
 
-ga_t   = namedtuple('ga_t', ['gtype', 'age'])
-gpa_t  = namedtuple('gpa_t', ['gtype', 'ptype', 'age'])
-gpfa_t = namedtuple('gpfa_t', ['gtype', 'ptype', 'fitness', 'age'])
+class individual:
+    def __init__(self, gtype=None, ptype=None, fitness=None, age=None):
+        self.gtype = gtype
+        self.ptype = ptype
+        self.fitness = fitness
+        self.age = age
+
+ga_t   = individual
+gpa_t  = individual
+gpfa_t = individual
 
 def most_fit(population):
     '''Return the most fit individual in the given population'''
