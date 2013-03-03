@@ -72,8 +72,8 @@ def dist_spike_interval(train1, train2):
     spikes1 = detect_spikes(train1)
     spikes2 = detect_spikes(train2)
     
-    n = min(len(spikes1), len(spikes2))
-    m = max(len(spikes1), len(spikes2))
+    n = max(len(spikes1), len(spikes2))
+    m = min(len(spikes1), len(spikes2))
     p = 2
     
     dist = sum(abs((spikes1[i] - spikes1[i-1])-(spikes2[i] - spikes2[i-1]))**p for i in xrange(1,m)) ** (1/p)

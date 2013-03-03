@@ -1,10 +1,10 @@
-50
-waveform
+100
+interval
 mix
-50
+100
 sigma
-0.4
-0.2
+0.3
+0.3
 choice
-2000
+400
 0
