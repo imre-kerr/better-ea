@@ -18,22 +18,22 @@ def evolutionary_algorithm(initial, development, fitness_test,
     '''Main EA loop. 
     
     Return a list of all generations, each a list of (gtype, ptype, fitness) touples'''
-    generation_list = [] # generation_list: [[(gtype, ptype, fitness) list] list]
-    genotypes = initial # genotypes: [(gtype, age) list]
+    generation_list = []
+    genotypes = initial
     stdout.write("\nProgress: generation ")
     for gen in xrange(generations):
         generation_s = str(gen)
         stdout.write(generation_s)
-        developed_population = development(genotypes) # developed_population: [(gtype, ptype, age) list]
-        tested_population = fitness_test(developed_population) # tested_population: [(gtype, ptype, fitness, age) list]
-        culled_population = adult_selection(tested_population) # culled_population: [(gtype, ptype, fitness, age) list]
+        developed_population = development(genotypes)
+        tested_population = fitness_test(developed_population)
+        culled_population = adult_selection(tested_population)
         generation_list += [culled_population]
         if fitness_goal != 0 and done(culled_population, fitness_goal):
             break
         # TODO: Uncomment this if Pauline wills it. Also use retested_population in next line.
         # retested_population = fitness_test(culled_population) # retested_population: [(gtype, ptype, fitness, age) list]
-        parents = parent_selection(culled_population) # parents: [(gtype1, gtype2) list]
-        offspring = reproduction(parents) # offspring: [(gtype, age) list] (age = 0)
+        parents = parent_selection(culled_population)
+        offspring = reproduction(parents)
         genotypes = gen_mix(offspring, culled_population)
         stdout.write('\b'*len(generation_s))
     print ""

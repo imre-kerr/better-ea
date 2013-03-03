@@ -100,21 +100,42 @@ def fitness_test(population, target, dist):
             continue
         distance = dist(ind.ptype, target)
         if distance != 0:
-            ind.fitness = 1 / dist(ind.ptype, target)
+            ind.fitness = 1 / distance
         else:
             ind.fitness = float('Inf')
     return tested
+
+def fitness_test_mp(population, target, dist):
+    '''Compute fitnesses based on distance to the target spike train'''
+    pool = mp.Pool(mp.cpu_count())
+    tested = population
+    indices = []
+    workers = []
+    for i, ind in enumerate(population):
+        if ind.fitness == None:
+            indices += [i]
+            workers += [pool.apply_async(dist, [ind.ptype, target])]
+    for i, worker in enumerate(workers):
+        distance = worker.get()
+        if distance != 0:
+            population[indices[i]].fitness = 1 / distance
+        else:
+            population[indices[i]].fitness = float('Inf')
+    pool.close()
+    pool.join()
+    return tested
+        
 
 def gen_fitness(target):
     '''Generate a fitness function interactively'''
     while True:
         method = raw_input("Input distance metric (time/interval/waveform):\n")
         if method == 'time':
-            return (lambda population: fitness_test(population, target, dist_spike_time))
+            return (lambda population: fitness_test_mp(population, target, dist_spike_time))
         elif method == 'interval':
-            return (lambda population: fitness_test(population, target, dist_spike_interval))
+            return (lambda population: fitness_test_mp(population, target, dist_spike_interval))
         elif method == 'waveform':
-            return (lambda population: fitness_test(population, target, dist_waveform))
+            return (lambda population: fitness_test_mp(population, target, dist_waveform))
         else:
             print "Unrecognized method: " + method
 
@@ -130,15 +151,15 @@ def develop(population):
 def develop_mp(population):
     '''Development function that makes use of multiprocessing'''
     developed = population
-    ptypes = []
+    workers = []
     indices = []
     pool = mp.Pool(mp.cpu_count())
     for i, ind in enumerate(developed):
         if ind.ptype != None:
             continue
         indices += [i]
-        ptypes += [pool.apply_async(spiketrain_list, [ind.gtype])]
-    for i, worker in enumerate(ptypes):
+        workers += [pool.apply_async(spiketrain_list, [ind.gtype])]
+    for i, worker in enumerate(workers):
         population[indices[i]].ptype = worker.get()
     pool.close()
     pool.join()
