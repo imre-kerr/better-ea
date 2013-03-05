@@ -14,12 +14,26 @@ def mutate_gaussian(gtype, ranges, prob, sigma):
             mutated[i] = min(mutated[i], ranges[i][1])
     return mutated
 
+def mutate_uniform(gtype, ranges, prob):
+    '''Mutate by setting values to a uniformly distributed random value (with P=prob)'''
+    mutated = list(gtype)
+    for i in xrange(len(mutated)):
+        if random.random() < prob:
+            mutated[i] = random.random() * (ranges[i][1] - ranges[i][0]) + ranges[i][0]
+    return mutated
+
 def gen_mutate(ranges):
     '''Generate a mutation function interactively'''
-    prob = float(raw_input("Input per-number mutation chance:\n"))
-    sigma = float(raw_input("Input standard deviation for mutations:\n"))
-    return (lambda gtype: mutate_gaussian(gtype, ranges, prob, sigma))
-
+    while True:
+        method = raw_input("Input mutation method(gauss, uniform):\n")
+        prob = float(raw_input("Input per-number mutation chance:\n"))
+        if method == 'gauss':
+            sigma = float(raw_input("Input standard deviation for mutations:\n"))
+            return (lambda gtype: mutate_gaussian(gtype, ranges, prob, sigma))
+        elif method == 'uniform':
+            return (lambda gtype: mutate_uniform(gtype, ranges, prob))
+        else:
+            print "Unrecognized method: " + method
 
 def choice_crossover(gtype1, gtype2):
     '''Cross two gtypes by randomly selecting elements from one or the other'''
