@@ -117,10 +117,7 @@ def fitness_test_mp(population, target, dist):
             workers += [pool.apply_async(dist, [ind.ptype, target])]
     for i, worker in enumerate(workers):
         distance = worker.get()
-        if distance != 0:
-            population[indices[i]].fitness = 1 / distance
-        else:
-            population[indices[i]].fitness = float('Inf')
+        population[indices[i]].fitness = 1 / (1 + distance)
     pool.close()
     pool.join()
     return tested
