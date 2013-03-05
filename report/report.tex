@@ -22,8 +22,10 @@
 \item{\textbf{Randomly weighted average crossover} --- For each parameter $p$ with parent values $p_a$ and $p_b$, generates a random value $x \in [ 0, 1 \rangle$, and sets $p = x p_a + (1-x)p_b$.}
 \end{itemize}
 
-\subsection{Fitness Function}
+\subsection{Fitness and Development}
 
-\paragraph{}Since we already have distance metrics, our fitness function is simply $\frac{1}{1+dist}$. This has the nice property of maximum fitness always being $1.0$.
+\paragraph{}Since we already have distance metrics, our fitness function is simply $\frac{1}{1+dist}$. This has the nice property of maximum fitness always being $1.0$. The distance and development functions are basically given in the assignment text, so no further description of these is necessary. However, we did find that these were quite computationally intensive, and there was a lot of speedup to be had by adding multiprocessing support for these functions.
+
+
 
 \end{document}
