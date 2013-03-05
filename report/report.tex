@@ -1,0 +1,29 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{graphicx}
+\author{Didrik Jonassen, Imre Kerr}
+\title{Project 2\\ IT3708 --- Subsymbolic methods in AI}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Description of Code}
+
+\paragraph{}To begin with, we decided to do a major rewrite of the base EA system, based on things we had learned in the previous assignment. The system design is now much more modular and consistent. For instance, every functional unit used in the loop is now a function that accepts a population and returns a population, and they are all used in the same way (by passing them as parameters to the main loop).
+
+\subsection{Genotype Representation}
+
+\paragraph{}Rather than using a bit-vector for the genotype, we opted to use a list of float values directly, one for each parameter value. This allowed us to use fancier mutation and crossover functions:
+\begin{itemize}
+\item{\textbf{Gaussian random walk mutation} --- Adds a gaussian random value to each float with a given probability. The standard deviation of this value is given as a fraction of the range of each variable.}
+\item{\textbf{Uniform value mutation} --- Sets each value to a uniformly distributed new value with a given probability.}
+\item{\textbf{Random choice crossover} --- Crosses two genomes by randomly choosing values from one or the other.}
+\item{\textbf{Randomly weighted average crossover} --- For each parameter $p$ with parent values $p_a$ and $p_b$, generates a random value $x \in [ 0, 1 \rangle$, and sets $p = x p_a + (1-x)p_b$.}
+\end{itemize}
+
+\subsection{Fitness Function}
+
+\paragraph{}Since we already have distance metrics, our fitness function is simply $\frac{1}{1+dist}$. This has the nice property of maximum fitness always being $1.0$.
+
+\end{document}
