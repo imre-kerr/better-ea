@@ -191,6 +191,7 @@ def visualize(generation_list, target):
     best_spiketrain = best_individual.ptype
 
     print best_individual.gtype
+    print best_individual.fitness
 
     pylab.figure(2)
     pylab.plot(range(len(best_spiketrain)), best_spiketrain, color='r', label='Best solution')
