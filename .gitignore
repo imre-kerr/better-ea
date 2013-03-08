@@ -37,5 +37,11 @@ nosetests.xml
 
 # Emacs temporaries
 *.*~
+*~
 \#*\#
 .\#*
+
+# Tex stuff
+*.aux
+*.log
+*.pdf
