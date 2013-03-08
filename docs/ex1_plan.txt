@@ -1,0 +1,33 @@
+ctrnn.py
+    General purpose implementation of the ANN
+    Hopefully reusable library
+    Represents a single ANN
+    constructor: takes list of weights, biases, gains and taus, returns a CTRNN object
+    step function: takes input values for timestep i, returns output values for that timestep, updates internal state (yuck) ;
+
+ex3.py
+    Problem-specific to exercise 3
+    Program entry point
+    Contains: ANN topology, fitness function, vidyagaem simulation
+
+Genotype: binary_gtype, 8 bits per parameter (because the fucking pdf says so.)
+
+Numbers of things:
+    input neurons:  I
+    hidden neurons: H
+    output neurons: O
+    Input-hidden edges:  I*H
+    Intra-hidden edges:  H^2
+    Hidden-output edges: H*O
+    Intra-output edges:  O^2
+    Bias edges:          H+O
+    Gains: 		 H+O
+    Time constants:	 H+O
+    Total params: I*H + H^2 + H*O + O^2 + 3*H + 3*O = H*(H + I + 3) + O*(O + H + 3)
+
+For our problem:
+    2*(2+5+3) + 2*(2+2+3) = 34
+
+Development function:
+    Input: List of bits
+    Output: beer_ctrnn object
