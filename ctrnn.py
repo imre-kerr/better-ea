@@ -1,69 +1,88 @@
+from __future__ import division
+import math
+
+class CTRNNNode:
+    def __init__(self, gain=0, tau=0):
+        self.parents = []
+        self.weights = []
+        self.gain = gain
+        self.tau = tau
+        self.internal_state = 0
+        self.output = 0
+        self.next_output = 0
+        
+    def add_parent(self, parent, weight):
+        '''Add a parent, duh.'''
+        self.parents += parent
+        self.weights += weight
+
+    def timestep(self):
+        '''Compute next output level, and update internal state.
+        
+        Should not be used for input nodes.'''
+        s = 0
+        for i, parent in enumerate(self.parents):
+            s += self.weights[i] * parent.output
+        self.y += (-self.y + s) / self.tau
+        self.next_output = 1/(1 + math.e**(self.y*self.gain))
+        
+    def update_output(self):
+        '''Actually update output levels. Makes sure all nodes see output from the same timestep.'''
+        self.output = self.next_output
+        
 class CTRNN:
     '''Implements a single instance of a Beer-type Continuous-Time Recurrent Neural Network'''
     def __init__(self, num_input, num_hidden, num_output, weight_list, bias_list, gain_list, tau_list):
         '''CTRNN constructor.
-
-        each *_list: list of floats
-
-        weight_list format: 
-          input-hidden edges (num_input * num_hidden)
-          intra-hidden edges (num_hidden**2)
-          hidden-output edges (num_hidden * num_output)
-          intra-output edges (num_output**2)
-
-        biases in a separate list because different ranges -> easier for development function
-        bias_list format: 
-          hidden biases (num_hidden)
-          output biases (num_output)
-          
-        gain_list format:
-          hidden gains (num_hidden)
-          output gains (num_output)
         
-        tau_list format:
-          hidden taus (num_hidden)
-          output taus (num_output)'''
-
+        Order of the weight list is complicated. Check the code.'''
+        # Create all the nodes 
         
-        self.num_input = num_input
-        self.num_hidden = num_hidden
-        self.num_output = num_output
-
-        self.input_nodes = range(num_input)
-        self.hidden_nodes = [i + num_input for i in xrange(num_hidden)]
-        self.output_nodes = [i + num_input + num_hidden for i in xrange(num_output)]
-        self.bias_node = num_input + num_hidden + num_output
-
-        num_nodes = num_input + num_hidden + num_output + 1
-        self.matrix = [[0]*(num_nodes) for i in xrange(num_nodes)]
-
-        for i in xrange(num_input):
-            for j in xrange(num_hidden):
-                self.matrix[self.input_nodes[i]][self.hidden_nodes[j]] = weight_list.pop(0)
-
+        self.bias_node = CTRNNNode()
+        self.bias_node.output = 1
+        
+        self.input_nodes = [CTRNNNode() for i in xrange(num_input)]
+        
+        self.hidden_nodes = []
         for i in xrange(num_hidden):
-            for j in xrange(num_hidden):
-                self.matrix[self.hidden_nodes[i]][self.hidden_nodes[j]] = weight_list.pop(0)
-
-        for i in xrange(num_hidden):
-            for j in xrange(num_output):
-                self.matrix[self.hidden_nodes[i]][self.output_nodes[j]] = weight_list.pop(0)
-
+            self.hidden_nodes.append(CTRNNNode(gain_list[i], tau_list[i]))
+        
+        self.output_nodes = []
         for i in xrange(num_output):
-            for j in xrange(num_output):
-                self.matrix[self.output_nodes[i]][self.output_nodes[j]] = weight_list.pop(0)
-
-        for i in xrange(num_hidden):
-            self.matrix[self.bias_node][self.hidden_nodes[i]] = bias_list.pop(0)
+            self.hidden_nodes.append(CTRNNNode(gain_list[num_hidden+i], tau_list[num_hidden+i]))
         
-        for i in xrange(num_output):
-            self.matrix[self.bias_node][self.output_nodes[i]] = bias_list.pop(0)
+        # Create connections between them  
+        
+        for node in self.hidden_nodes:
+            for parent in self.input_nodes:
+                node.add_parent(parent, weight_list.pop())
+            for parent in self.hidden_nodes:
+                node.add_parent(parent, weight_list.pop())
+            node.add_parent(self.bias_node, bias_list.pop())
+                
+        for node in self.output_nodes:
+            for parent in self.hidden_nodes:
+                node.add_parent(parent, weight_list.pop())
+            for parent in self.output_nodes:
+                node.add_parent(parent, weight_list.pop())
+            node.add_parent(self.bias_node, bias_list.pop())
+            
+            
+    def timestep(self, sensor_input):
+        '''Compute new output levels for all nodes.
+        
+        Each layer updates its outputs before the next layer is computed.'''
+        for i, value in sensor_input:
+            self.input_nodes[i].output = value
+            
+        for node in self.hidden_nodes:
+            node.timestep()
+        for node in self.hidden_nodes:
+            node.update_output()            
 
-        self.hidden_gains = gain_list[:num_hidden]
-        self.output_gains = gain_list[-num_output:]
-
-        self.hidden_taus = tau_list[:num_hidden]
-        self.output_taus = tau_list[-num_output:]
-
-        self.hidden_states = [0] * num_hidden
-        self.output_states = [0] * num_output
+        for node in self.output_nodes:
+            node.timestep()
+        for node in self.output_nodes:
+            node.update_output()
+            
+        return [node.output for node in self.output_nodes]
