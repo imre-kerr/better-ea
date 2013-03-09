@@ -14,10 +14,7 @@ def fitness_test(population, visual):
     '''Play a game with each individual in the population and assign fitness based on score'''
     game = min_cog_game.Game()
     for ind in population:
-        if visual:
-            score = game.play_visual(ind.ptype)
-        else:
-            score = game.play(ind.ptype)
+        score = game.play(ind.ptype, visual)
         ind.fitness = max(0, score)
     return population
     

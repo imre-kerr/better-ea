@@ -70,9 +70,7 @@ class CTRNN:
             
             
     def timestep(self, sensor_input):
-        '''Compute new output levels for all nodes.
-        
-        Each layer updates its outputs before the next layer is computed.'''
+        '''Compute new output levels for all nodes, and return output from output nodes.'''
         for i, value in sensor_input:
             self.input_nodes[i].output = value
             
