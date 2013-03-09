@@ -1,3 +1,5 @@
+JUST MY RANDOM MUSINGS! PROBABLY HORRIBLY OUTDATED!
+
 ctrnn.py
     General purpose implementation of the ANN
     Hopefully reusable library
