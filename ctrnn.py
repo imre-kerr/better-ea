@@ -13,8 +13,8 @@ class CTRNNNode:
         
     def add_parent(self, parent, weight):
         '''Add a parent, duh.'''
-        self.parents += parent
-        self.weights += weight
+        self.parents.append(parent)
+        self.weights.append(weight)
 
     def timestep(self):
         '''Compute next output level, and update internal state.
@@ -32,7 +32,8 @@ class CTRNNNode:
         
 class CTRNN:
     '''Implements a single instance of a Beer-type Continuous-Time Recurrent Neural Network'''
-    def __init__(self, num_input, num_hidden, num_output, weight_list, bias_list, gain_list, tau_list):
+    def __init__(self, num_input, num_hidden, num_output, 
+                 weight_list, bias_list, gain_list, tau_list):
         '''CTRNN constructor.
         
         Order of the weight list is complicated. Check the code.'''
