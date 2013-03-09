@@ -40,7 +40,6 @@ def develop(population, num_input, num_hidden, num_output):
     num_taus = num_hidden + num_output
     
     for ind in population:
-        print len(ind.gtype)
         i = 0
         weight_list = ind.gtype[i:i+num_weights]
         i += num_weights
@@ -49,6 +48,7 @@ def develop(population, num_input, num_hidden, num_output):
         gain_list = ind.gtype[i:i+num_gains]
         i += num_gains
         tau_list = ind.gtype[i:i+num_taus]
+        
         ind.ptype = ctrnn.CTRNN(num_input, num_hidden, num_output, 
                                 weight_list, bias_list, gain_list, tau_list)
     return population

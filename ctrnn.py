@@ -50,7 +50,7 @@ class CTRNN:
         
         self.output_nodes = []
         for i in xrange(num_output):
-            self.hidden_nodes.append(CTRNNNode(gain_list[num_hidden+i], tau_list[num_hidden+i]))
+            self.output_nodes.append(CTRNNNode(gain_list[num_hidden+i], tau_list[num_hidden+i]))
         
         # Create connections between them  
         
