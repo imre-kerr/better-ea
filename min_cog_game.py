@@ -5,13 +5,16 @@ class Game:
     board_width = 30
     board_height = 15
     block_size = 30
+	horizontal_direction = 0
+	num_drops = 40
 
     def __init__(self):
         '''Generate a game instance that can be played by several agents in turn.
         
         Order of blocks should be decided here.'''
         
-        # CODE GOES HERE
+        self.block_sizes = [random.randint(1, 6) for i in range(num_drops)]
+		self.block_positions = [random.randint(0, board_size - i) for i in self.block_sizes]
         
         
     def visual_init(self):
