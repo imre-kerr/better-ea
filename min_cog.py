@@ -50,6 +50,40 @@ def develop(population, num_input, num_hidden, num_output):
                                 weight_list, bias_list, gain_list, tau_list)
     return population
         
+def visualize(generation_list):
+    '''Generate pretty pictures using pylab and pygame'''
+    best = []
+    average = []
+    stddev = []
+    average_plus_stddev = []
+    average_minus_stddev = []
+    for pop in generation_list:
+        best += [most_fit(pop).fitness]
+        average += [avg_fitness(pop)]
+        stddev += [fitness_stddev(pop)] 
+        average_plus_stddev += [average[-1] + stddev[-1]]
+        average_minus_stddev += [average[-1] - stddev[-1]]
+    
+    pylab.figure(1)
+    pylab.fill_between(range(len(generation_list)), average_plus_stddev, average_minus_stddev, alpha=0.2, color='b', label="Standard deviation")
+    pylab.plot(range(len(generation_list)), best, color='r', label='Best')
+    pylab.plot(range(len(generation_list)), average, color='b', label='Average with std.dev.')
+    pylab.title("Fitness plot - Beer-cog")
+    pylab.xlabel("Generation")
+    pylab.ylabel("Fitness")
+    pylab.legend(loc="upper left")
+    pylab.savefig("mincog_fitness.png")
+
+    best_index = best.index(max(best))
+    best_individual = most_fit(generation_list[best_index])
+
+    print best_individual.gtype
+    print best_individual.fitness
+    
+    game = min_cog_game.Game()
+    game.play(best_individual.ptype, True)
+    
+        
 if __name__ == "__main__":
     popsize = int(raw_input("Input population size:\n"))
     
@@ -79,7 +113,9 @@ if __name__ == "__main__":
     
     development = partial(develop, num_input=num_input, num_hidden=num_hidden, num_output=num_output)
     fitness_tester = gen_fitness()
-
+    
     initial = [individual(gtype=float_gtype.generate(ranges), age=0) for i in xrange(popsize)]
     
     generation_list = main.evolutionary_algorithm(initial, development, fitness_tester, adult_selector, parent_selector, reproducer, generations, fitness_goal)
+    
+    visualize(generation_list)
