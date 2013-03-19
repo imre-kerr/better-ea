@@ -1,5 +1,6 @@
 import pygame
 import random
+from operator import mul
 
 class Game:
     board_width = 30
@@ -58,14 +59,43 @@ class Game:
         Object's internal state should NOT change between successive calls.
         If visual is True, a visualization of the gameplay should be shown.'''
         
+		score = 0
+		
         if visual:
             self.visual_init()
         
-        num_timesteps = 100
-        for step in xrange(num_timesteps):
-            # REAL STUFF
+        for drop in xrange(num_drops):
+			object = range(self.block_position[drop], self.block_size[drop]+1)
+			agent = range(13, 18)
+			
+			if visual:
+				self.board = [[0]*self.board_width for i in xrange(self.board_height)]
+				for i in object:
+					self.board[i][step] = 1
+				for i in agent:
+					self.board[i][14] = 2
+				self.visual_frame()
+				
+            for step in xrange(board_height):
+				sensor_input = [i in object for i in agent]
+				left_motion, right_motion = ctrnn.timestep(sensor_input)
+				motion = round(4*right_motion - 4*left_motion)
+				agent = [i + motion for i in agent]
+				object = [i + self.horizontal_direction for i in object]
             
-            if visual:
-                self.visual_frame()
+				if visual:
+					self.board = [[0]*self.board_width for i in xrange(self.board_height)]
+					for i in object:
+						self.board[i][step] = 1
+					for i in agent:
+						self.board[i][14] = 2
+					self.visual_frame()
+				
+			if self.block_size[drop] < 5:
+				score += reduce(mul, (i in agent for i in object), 1)
+			else:
+				score += 1 if sum((i in object for i in agent)) else 0
                 
         pygame.quit()
+		
+		return score
