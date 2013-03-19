@@ -29,13 +29,13 @@ class Game:
         self.black_color = pygame.Color(0,0,0)
         self.red_color = pygame.Color(255,0,0)
         self.blue_color = pygame.Color(0,0,255)
+        self.white_color = pygame.Color(255,255,255)
         
         self.font_obj = pygame.font.Font('freesansbold.ttf', 32)
         
         
     def visual_frame(self):
         '''Draw a single frame and sync to 3 FPS'''
-                
         for x in xrange(Game.board_width):
             for y in xrange(Game.board_height):
                 cell = self.board[x][y]
@@ -48,6 +48,11 @@ class Game:
                     color = self.red_color
                 pygame.draw.rect(self.window_surface_obj, color, pygame.Rect(x*Game.block_size, y*Game.block_size, Game.block_size, Game.block_size))
             
+        self.msg_surface = self.font_obj.render("Score: " + str(self.score), False, self.white_color)
+        self.msg_rect = self.msg_surface.get_rect()
+        self.msg_rect.topleft = (10,10)
+        self.window_surface_obj.blit(self.msg_surface, self.msg_rect)
+        
         for event in pygame.event.get():
             'DOOOO NOTHIIIIIINGG'
             
@@ -61,13 +66,13 @@ class Game:
         Object's internal state should NOT change between successive calls.
         If visual is True, a visualization of the gameplay should be shown.'''
         
-        score = 0
+        self.score = 0
         
         if visual:
             self.visual_init()
         
         for drop in xrange(self.num_drops):
-            object = range(self.object_positions[drop], self.object_positions[drop] + self.object_sizes[drop]+1)
+            object = range(self.object_positions[drop], self.object_positions[drop] + self.object_sizes[drop])
             agent = range(13, 18)
             
             if visual:
@@ -95,12 +100,12 @@ class Game:
                     self.visual_frame()
                 
             if self.object_sizes[drop] < 5:
-                score += reduce(mul, (i in agent for i in object), 1)
+                self.score += reduce(mul, (i in agent for i in object), 1)
             else:
-                score += 0 if sum((i in object for i in agent)) else 1
+                self.score += 0 if sum((i in object for i in agent)) else 1
                 
             ctrnn.reset()
                 
         pygame.quit()
         
-        return score
+        return self.score
