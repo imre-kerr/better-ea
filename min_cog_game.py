@@ -38,7 +38,7 @@ class Game:
                 
         for x in xrange(Game.board_width):
             for y in xrange(Game.board_height):
-                # cell = self.board[x][y]
+                cell = self.board[x][y]
                 cell = random.choice((0,1,2))
                 color = None
                 if cell == 0:
