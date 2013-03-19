@@ -71,7 +71,7 @@ class CTRNN:
             
     def timestep(self, sensor_input):
         '''Compute new output levels for all nodes, and return output from output nodes.'''
-        for i, value in sensor_input:
+        for i, value in enumerate(sensor_input):
             self.input_nodes[i].output = value
             
         for node in self.hidden_nodes:
