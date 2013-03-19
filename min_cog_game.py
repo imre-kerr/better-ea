@@ -47,7 +47,10 @@ class Game:
                 else:
                     color = self.red_color
                 pygame.draw.rect(self.window_surface_obj, color, pygame.Rect(x*Game.block_size, y*Game.block_size, Game.block_size, Game.block_size))
-                
+            
+        for event in pygame.event.get():
+            'DOOOO NOTHIIIIIINGG'
+            
         pygame.display.update()
         self.fps_clock.tick(5)
         
@@ -64,7 +67,7 @@ class Game:
             self.visual_init()
         
         for drop in xrange(self.num_drops):
-            object = range(self.object_positions[drop], self.object_sizes[drop]+1)
+            object = range(self.object_positions[drop], self.object_positions[drop] + self.object_sizes[drop]+1)
             agent = range(13, 18)
             
             if visual:
