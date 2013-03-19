@@ -82,13 +82,9 @@ class Game:
                 sensor_input = [i in object for i in agent]
                 left_motion, right_motion = ctrnn.timestep(sensor_input)
                 motion = int(round(4*right_motion - 4*left_motion))
-                for i in xrange(5):
-                    agent[i] += motion
-                    agent[i] %= self.board_width
+                agent = [(i + motion)%self.board_width for i in agent]
                 if self.horizontal_direction != 0:
-                    for i in xrange(len(object)):
-                        object[i] += self.horizontal_direction
-                        object[i] %= self.board_width
+                    object = [(i + self.horizontal_direction)%self.board_width for i in object]
             
                 if visual:
                     self.board = [[0]*self.board_height for i in xrange(self.board_width)]
