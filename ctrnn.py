@@ -7,7 +7,6 @@ class CTRNNNode:
         self.weights = []
         self.gain = gain
         self.tau = tau
-        self.internal_state = 0
         self.output = 0
         self.next_output = 0
         self.y = 0
@@ -16,6 +15,12 @@ class CTRNNNode:
         '''Add a parent, duh.'''
         self.parents.append(parent)
         self.weights.append(weight)
+        
+    def reset(self):
+        '''Reset all internal state'''
+        self.output = 0
+        self.next_output = 0
+        self.y = 0
 
     def timestep(self):
         '''Compute next output level, and update internal state.
@@ -69,6 +74,12 @@ class CTRNN:
                 node.add_parent(parent, weight_list.pop())
             node.add_parent(self.bias_node, bias_list.pop())
             
+    def reset(self):
+        '''Reset internal state of each node'''
+        for node in self.hidden_nodes:
+            node.reset()            
+        for node in self.output_nodes:
+            node.reset()            
             
     def timestep(self, sensor_input):
         '''Compute new output levels for all nodes, and return output from output nodes.'''
