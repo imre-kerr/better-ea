@@ -7,6 +7,8 @@ from ea import float_gtype
 from ea import main
 from ea.ea_globals import *
 
+import pylab
+
 import ctrnn
 import min_cog_game
 

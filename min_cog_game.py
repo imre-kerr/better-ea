@@ -39,7 +39,6 @@ class Game:
         for x in xrange(Game.board_width):
             for y in xrange(Game.board_height):
                 cell = self.board[x][y]
-                cell = random.choice((0,1,2))
                 color = None
                 if cell == 0:
                     color = self.black_color
@@ -79,7 +78,7 @@ class Game:
 			for step in xrange(self.board_height):
 				sensor_input = [i in object for i in agent]
     			left_motion, right_motion = ctrnn.timestep(sensor_input)
-    			motion = round(4*right_motion - 4*left_motion)
+    			motion = int(round(4*right_motion - 4*left_motion))
     			agent = [(i + motion)%self.board_width for i in agent]
     			object = [(i + self.horizontal_direction)%self.board_width for i in object]
             
@@ -91,7 +90,7 @@ class Game:
     					self.board[i][14] = 2
     				self.visual_frame()
     			
-    		if self.block_size[drop] < 5:
+    		if self.object_sizes[drop] < 5:
     			score += reduce(mul, (i in agent for i in object), 1)
     		else:
     			score += 1 if sum((i in object for i in agent)) else 0

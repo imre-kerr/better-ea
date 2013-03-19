@@ -10,6 +10,7 @@ class CTRNNNode:
         self.internal_state = 0
         self.output = 0
         self.next_output = 0
+        self.y = 0
         
     def add_parent(self, parent, weight):
         '''Add a parent, duh.'''
