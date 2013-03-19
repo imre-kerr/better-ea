@@ -1,4 +1,7 @@
 from functools import partial
+import copy
+import pylab
+import multiprocessing as mp
 
 from ea import adult_selection
 from ea import parent_selection
@@ -7,18 +10,41 @@ from ea import float_gtype
 from ea import main
 from ea.ea_globals import *
 
-import pylab
-
 import ctrnn
 import min_cog_game
+
+def fitness_thread(agent, game):
+    '''A single fitness testing thread'''
+    return game.play(agent, False)
+    
+def fitness_test_mp(population, game):
+    '''Multiprocessing fitness test'''
+    games = [copy.deepcopy(game) for i in xrange(len(population))]
+    pool = mp.Pool(mp.cpu_count())
+    indices = []
+    workers = []
+    for i, ind in enumerate(population):
+        if ind.fitness == None:
+            indices += [i]
+            workers += [pool.apply_async(fitness_thread, [ind.ptype, games[i]])]
+    for i, worker in enumerate(workers):
+        score = worker.get()
+        population[indices[i]].fitness = max(0, score)
+    pool.close()
+    pool.join()
+    return population
+    
 
 def fitness_test(population, visual):
     '''Play a game with each individual in the population and assign fitness based on score'''
     game = min_cog_game.Game()
-    for ind in population:
-        score = game.play(ind.ptype, visual)
-        ind.fitness = max(0, score)
-    return population
+    if visual:
+        for ind in population:
+            score = game.play(ind.ptype, visual)
+            ind.fitness = max(0, score)
+        return population
+    else:
+        return fitness_test_mp(population, game)
     
 def gen_fitness():
     '''Generate the fitness function interactively'''
