@@ -15,7 +15,7 @@ class Game:
         Order of blocks should be decided here.'''
         
         self.object_sizes = [random.randint(1, 6) for i in range(self.num_drops)]
-        self.object_positions = [random.randint(0, self.board_width - i - 1) for i in self.object_sizes]
+        self.object_positions = [random.randint(0, self.board_width - i) for i in self.object_sizes]
         
         
     def visual_init(self):
@@ -102,7 +102,7 @@ class Game:
             if self.object_sizes[drop] < 5:
                 self.score += reduce(mul, (i in agent for i in object), 1)
             else:
-                self.score += 0 if sum((i in object for i in agent)) else 1
+                self.score += 0 if sum((i in object for i in agent)) else 1.3
                 
             ctrnn.reset()
                 
