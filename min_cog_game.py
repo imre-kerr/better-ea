@@ -1,13 +1,19 @@
+from __future__ import division
+
 import pygame
 import random
 from operator import mul
 
 class Game:
+    agent_size = 5
+    max_motion = 4
+
     board_width = 30
     board_height = 15
     block_size = 30
     horizontal_direction = 0
     num_drops = 40
+    
 
     def __init__(self):
         '''Generate a game instance that can be played by several agents in turn.
@@ -71,28 +77,30 @@ class Game:
         if visual:
             self.visual_init()
         
-        for drop in xrange(self.num_drops):
+        for drop in xrange(Game.num_drops):
             object = range(self.object_positions[drop], self.object_positions[drop] + self.object_sizes[drop])
-            agent = range(13, 18)
+            agent_start = Game.board_width//2 - Game.agent_size//2
+            agent = range(agent_start, agent_start+Game.agent_size)
             
             if visual:
-                self.board = [[0]*self.board_height for i in xrange(self.board_width)]
+                self.board = [[0]*Game.board_height for i in xrange(Game.board_width)]
                 for i in object:
                     self.board[i][0] = 1
                 for i in agent:
-                    self.board[i][14] = 2
+                    self.board[i][Game.board_height-1] = 2
                 self.visual_frame()
                 
             for step in xrange(self.board_height):
                 sensor_input = [i in object for i in agent]
                 left_motion, right_motion = ctrnn.timestep(sensor_input)
-                motion = int(round((left_motion + right_motion)*4 - 4))
-                agent = [(i + motion)%self.board_width for i in agent]
-                if self.horizontal_direction != 0:
-                    object = [(i + self.horizontal_direction)%self.board_width for i in object]
+                motion_sum = left_motion + right_motion
+                motion = int(round((motion_sum)*Game.max_motion - Game.max_motion))
+                agent = [(i + motion)%Game.board_width for i in agent]
+                if Game.horizontal_direction != 0:
+                    object = [(i + Game.horizontal_direction)%Game.board_width for i in object]
             
                 if visual:
-                    self.board = [[0]*self.board_height for i in xrange(self.board_width)]
+                    self.board = [[0]*Game.board_height for i in xrange(Game.board_width)]
                     for i in object:
                         self.board[i][step] = 1
                     for i in agent:
