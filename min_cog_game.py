@@ -34,11 +34,11 @@ class Game:
         self.font_obj = pygame.font.Font('freesansbold.ttf', 32)
         
         
-    def visual_frame(self):
+    def visual_frame(self, score, board):
         '''Draw a single frame and sync to 3 FPS'''
         for x in xrange(Game.board_width):
             for y in xrange(Game.board_height):
-                cell = self.board[x][y]
+                cell = board[x][y]
                 color = None
                 if cell == 0:
                     color = self.black_color
@@ -48,7 +48,7 @@ class Game:
                     color = self.red_color
                 pygame.draw.rect(self.window_surface_obj, color, pygame.Rect(x*Game.block_size, y*Game.block_size, Game.block_size, Game.block_size))
             
-        self.msg_surface = self.font_obj.render("Score: " + str(self.score), False, self.white_color)
+        self.msg_surface = self.font_obj.render("Score: " + str(score), False, self.white_color)
         self.msg_rect = self.msg_surface.get_rect()
         self.msg_rect.topleft = (10,10)
         self.window_surface_obj.blit(self.msg_surface, self.msg_rect)
@@ -57,7 +57,7 @@ class Game:
             'DOOOO NOTHIIIIIINGG'
             
         pygame.display.update()
-        self.fps_clock.tick(5)
+        self.fps_clock.tick(10)
         
  
     def play(self, ctrnn, visual):
@@ -66,7 +66,7 @@ class Game:
         Object's internal state should NOT change between successive calls.
         If visual is True, a visualization of the gameplay should be shown.'''
         
-        self.score = 0
+        score = 0
         
         if visual:
             self.visual_init()
@@ -76,12 +76,12 @@ class Game:
             agent = range(13, 18)
             
             if visual:
-                self.board = [[0]*self.board_height for i in xrange(self.board_width)]
+                board = [[0]*self.board_height for i in xrange(self.board_width)]
                 for i in object:
-                    self.board[i][0] = 1
+                    board[i][0] = 1
                 for i in agent:
-                    self.board[i][14] = 2
-                self.visual_frame()
+                    board[i][14] = 2
+                self.visual_frame(score, board)
                 
             for step in xrange(self.board_height):
                 sensor_input = [i in object for i in agent]
@@ -92,20 +92,21 @@ class Game:
                     object = [(i + self.horizontal_direction)%self.board_width for i in object]
             
                 if visual:
-                    self.board = [[0]*self.board_height for i in xrange(self.board_width)]
+                    board = [[0]*self.board_height for i in xrange(self.board_width)]
                     for i in object:
-                        self.board[i][step] = 1
+                        board[i][step] = 1
                     for i in agent:
-                        self.board[i][14] = 2
-                    self.visual_frame()
+                        board[i][14] = 2
+                    self.visual_frame(score, board)
                 
             if self.object_sizes[drop] < 5:
-                self.score += reduce(mul, (i in agent for i in object), 1)
+                score += reduce(mul, (i in agent for i in object), 1)
             else:
-                self.score += 0 if sum((i in object for i in agent)) else 1
+                score += 0 if sum((i in object for i in agent)) else 1
                 
             ctrnn.reset()
-                
-        pygame.quit()
         
-        return self.score
+        if visual:
+            pygame.quit()   
+
+        return score
