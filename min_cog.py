@@ -28,7 +28,10 @@ def fitness_test_mp(population, game):
         workers += [pool.apply_async(fitness_thread, [ind.ptype, games[i]])]
     for i, worker in enumerate(workers):
         score = worker.get()
-        population[indices[i]].fitness = max(0, score)
+        if population[indices[i]].fitness:
+            population[indices[i]].fitness = (population[indices[i]] + score)/2.
+        else:
+            population[indices[i]].fitness = max(0, score)
     pool.close()
     pool.join()
     return population
