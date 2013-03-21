@@ -22,7 +22,7 @@ def evolutionary_algorithm(initial, development, fitness_test,
     genotypes = initial
     stdout.write("\nProgress: generation ")
     for gen in xrange(generations):
-        generation_s = str(gen)
+        generation_s = str(gen+1)
         stdout.write(generation_s)
         developed_population = development(genotypes)
         tested_population = fitness_test(developed_population)
