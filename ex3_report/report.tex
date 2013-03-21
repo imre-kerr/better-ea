@@ -31,7 +31,6 @@
 \section{Catching Behavior}
 \subsection{Methodology}
 \paragraph{}For evolving only catching behavior, we modified the game class to give 0 points both for catching and avoiding large objects. Small objects still had to be caught entirely to give points. The fitness function plays a game with each agent, and then sets the fitness to $\frac{prev\_fitness + score}{2}$. This exponential moving average method helps us avoid ``lucky idiots'' by testing each agent multiple times.
-
 \paragraph{}The EA parameters used were as follows:\\
 \begin{tabular}{ll}
 \hline
@@ -54,7 +53,23 @@ Max generations & 100 \\
 
 \section{Catching and Avoidance}
 \subsection{Methodology}
-
+\paragraph{}For evolving catching and avoidance, we used the same exponential moving average method as for catching only, but of course we used the standard scoring (1 point for a correct catch, 1.2 points for a correct avoidance).
+\paragraph{}Since catching and avoidance are harder than just catching, we upped the population size and max generations:\\
+\begin{tabular}{ll}
+\hline
+Parameter & Value \\
+\hline \hline
+Population size & 100 \\
+Adult selection & Generational mixing \\
+Litter size & 100 \\
+Parent selection & Sigma scaling \\
+Mutation type & Gaussian \\
+Mutation rate & 0.06 \\
+Mutation std.dev. & 0.2 \\
+Crossover type & Random choice \\
+Max generations & 300 \\
+\hline
+\end{tabular}
 
 \subsection{Results}
 \paragraph{}We ran the test three times. The first time, we got an agent that tried to catch everything. The second time, we got one with an interesting, but inconsistent, avoidance strategy. The last one worked almost perfectly, and an expanded description follows here:
