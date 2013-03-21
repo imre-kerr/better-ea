@@ -110,7 +110,7 @@ class Game:
             if self.object_sizes[drop] < Game.agent_size:
                 score += reduce(mul, (i in agent for i in object), 1)
             else:
-                score += 0 if sum((i in object for i in agent)) else 1.3
+                score += 0 if sum((i in object for i in agent)) else 1.2
                 
             ctrnn.reset()
 
