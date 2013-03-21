@@ -50,9 +50,14 @@ Max generations & 100 \\
 \end{tabular}
 
 \subsection{Results}
-Over 20 runs, 17 of the agents caught every small object. In one case, one was missed by running past it, and in two others there was a partial catch.
+\paragraph{}Over 20 runs, 17 of the agents caught every small object. In one case, one was missed by running past it, and in two others there was a partial catch.
 
 \section{Catching and Avoidance}
+\subsection{Methodology}
 
+
+\subsection{Results}
+\paragraph{}We ran the test three times. The first time, we got an agent that tried to catch everything. The second time, we got one with an interesting, but inconsistent, avoidance strategy. The last one worked almost perfectly, and an expanded description follows here:
+\paragraph{}To begin with, the tracker moves right at a speed of two units per turn. It keeps doing this until it sees an object, at which point it slows down to determine the size. If it's a small object, it stops and catches it. If it's a large object, it speeds up and then stops to the right of the object. It will never move left, but two units per turn gives plenty of time to wrap around and reach an object directly to the left, and get out of harm's way if necessary.
 
 \end{document}
