@@ -26,11 +26,9 @@ class CTRNNNode:
         '''Compute next output level, and update internal state.
         
         Should not be used for input nodes.'''
-        s = 0
-        for i, parent in enumerate(self.parents):
-            s += self.weights[i] * parent.output
-        self.y += (-self.y + s) / self.tau
-        self.next_output = 1/(1 + math.e**(self.y*self.gain))
+        s = sum([self.weights[i] * self.parents[i].output for i in xrange(len(self.parents))])
+        self.y += (s - self.y) / self.tau
+        self.next_output = 1/(1 + math.exp(self.y*self.gain))
         
     def update_output(self):
         '''Actually update output levels. Makes sure all nodes see output from the same timestep.'''
@@ -80,11 +78,11 @@ class CTRNN:
             node.reset()            
         for node in self.output_nodes:
             node.reset()            
-            
+    
     def timestep(self, sensor_input):
         '''Compute new output levels for all nodes, and return output from output nodes.'''
-        for i, value in enumerate(sensor_input):
-            self.input_nodes[i].output = value
+        for i in xrange(len(sensor_input)):
+            self.input_nodes[i].output = sensor_input[i]
             
         for node in self.hidden_nodes:
             node.timestep()
