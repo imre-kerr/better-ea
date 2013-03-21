@@ -105,10 +105,11 @@ def visualize(generation_list):
     pylab.savefig("mincog_fitness.png")
 
     best_index = best.index(max(best))
-    best_individual = most_fit(generation_list[best_index])
+    best_individual = most_fit(generation_list[-1])
 
+    with open('last.txt','w') as f:
+        f.write(str(best_individual.gtype))
     print best_individual.gtype
-    print best_individual.fitness
     
     game = min_cog_game.Game()
     game.play(best_individual.ptype, True)
