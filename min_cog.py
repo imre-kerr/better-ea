@@ -29,7 +29,7 @@ def fitness_test_mp(population, game):
     for i, worker in enumerate(workers):
         score = worker.get()
         if population[indices[i]].fitness:
-            population[indices[i]].fitness = (population[indices[i]] + score)/2.
+            population[indices[i]].fitness = (population[indices[i]].fitness + score)/2.
         else:
             population[indices[i]].fitness = max(0, score)
     pool.close()
