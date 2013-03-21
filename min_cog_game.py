@@ -1,13 +1,19 @@
+from __future__ import division
+
 import pygame
 import random
 from operator import mul
 
 class Game:
+    agent_size = 5
+    max_motion = 4
+
     board_width = 30
     board_height = 15
     block_size = 30
     horizontal_direction = 0
     num_drops = 40
+    
 
     def __init__(self):
         '''Generate a game instance that can be played by several agents in turn.
@@ -15,7 +21,7 @@ class Game:
         Order of blocks should be decided here.'''
         
         self.object_sizes = [random.randint(1, 6) for i in range(self.num_drops)]
-        self.object_positions = [random.randint(0, self.board_width - i - 1) for i in self.object_sizes]
+        self.object_positions = [random.randint(0, self.board_width - i) for i in self.object_sizes]
         
         
     def visual_init(self):
@@ -71,41 +77,43 @@ class Game:
         if visual:
             self.visual_init()
         
-        for drop in xrange(self.num_drops):
+        for drop in xrange(Game.num_drops):
             object = range(self.object_positions[drop], self.object_positions[drop] + self.object_sizes[drop])
-            agent = range(13, 18)
+            agent_start = Game.board_width//2 - Game.agent_size//2
+            agent = range(agent_start, agent_start+Game.agent_size)
             
             if visual:
                 board = [[0]*self.board_height for i in xrange(self.board_width)]
                 for i in object:
                     board[i][0] = 1
                 for i in agent:
-                    board[i][14] = 2
+                    board[i][Game.board_height-1] = 2
                 self.visual_frame(score, board)
                 
-            for step in xrange(self.board_height):
+            for step in xrange(Game.board_height):
                 sensor_input = [i in object for i in agent]
                 left_motion, right_motion = ctrnn.timestep(sensor_input)
-                motion = int(round(4*right_motion - 4*left_motion))
-                agent = [(i + motion)%self.board_width for i in agent]
-                if self.horizontal_direction != 0:
-                    object = [(i + self.horizontal_direction)%self.board_width for i in object]
+                motion_sum = left_motion + right_motion
+                motion = int(round((motion_sum)*Game.max_motion - Game.max_motion))
+                agent = [(i + motion)%Game.board_width for i in agent]
+                if Game.horizontal_direction != 0:
+                    object = [(i + Game.horizontal_direction)%Game.board_width for i in object]
             
                 if visual:
-                    board = [[0]*self.board_height for i in xrange(self.board_width)]
+                    board = [[0]*self.board_height for i in xrange(Game.board_width)]
                     for i in object:
                         board[i][step] = 1
                     for i in agent:
-                        board[i][14] = 2
+                        board[i][Game.board_height-1] = 2
                     self.visual_frame(score, board)
                 
-            if self.object_sizes[drop] < 5:
+            if self.object_sizes[drop] < Game.agent_size:
                 score += reduce(mul, (i in agent for i in object), 1)
             else:
-                score += 0 if sum((i in object for i in agent)) else 1
+                score += 0 if sum((i in object for i in agent)) else 1.3
                 
             ctrnn.reset()
-        
+
         if visual:
             pygame.quit()   
 
