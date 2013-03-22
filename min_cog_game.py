@@ -76,6 +76,7 @@ class Game:
         If visual is True, a visualization of the gameplay should be shown.'''
         
         score = 0
+        max_score = 0
         
         if visual:
             self.visual_init()
@@ -112,8 +113,10 @@ class Game:
                     
             if self.object_sizes[drop] < Game.agent_size:
                 score += reduce(mul, (i in agent for i in object), 1)
+                max_score += 1
             else:
                 score += 0 if sum((i in object for i in agent)) else 1.2 
+                max_score += 1.2
              
             if visual:
                 self.visual_frame(score, board, 0)
@@ -122,6 +125,8 @@ class Game:
             ctrnn.reset()
 
         if visual:
-            pygame.quit()   
-
+            pygame.quit()
+        
+        score /= max_score
+        
         return score

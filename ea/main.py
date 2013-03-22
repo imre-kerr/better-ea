@@ -27,7 +27,7 @@ def evolutionary_algorithm(initial, development, fitness_test,
         developed_population = development(genotypes)
         tested_population = fitness_test(developed_population)
         culled_population = adult_selection(tested_population)
-        generation_list += [culled_population]
+        generation_list += [copy.deepcopy(culled_population)]
         if fitness_goal != 0 and done(culled_population, fitness_goal):
             break
         # TODO: Uncomment this if Pauline wills it. Also use retested_population in next line.
