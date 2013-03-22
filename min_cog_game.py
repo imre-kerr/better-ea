@@ -11,7 +11,7 @@ class Game:
     board_width = 30
     board_height = 15
     block_size = 30
-    horizontal_direction = 0
+    horizontal_direction = 1
     num_drops = 40
     
 
@@ -36,6 +36,7 @@ class Game:
         self.red_color = pygame.Color(255,0,0)
         self.blue_color = pygame.Color(0,0,255)
         self.white_color = pygame.Color(255,255,255)
+        self.purple_color = pygame.Color(255,0,255)
         
         self.font_obj = pygame.font.Font('freesansbold.ttf', 32)
         
@@ -50,15 +51,17 @@ class Game:
                     color = self.black_color
                 elif cell == 1:
                     color = self.blue_color
-                else:
+                elif cell == 2:
                     color = self.red_color
+                else:
+                    color = self.purple_color
                 pygame.draw.rect(self.window_surface_obj, color, pygame.Rect(x*Game.block_size, y*Game.block_size, Game.block_size, Game.block_size))
             
         self.msg_surface = self.font_obj.render("Score: " + str(score), False, self.white_color)
         self.msg_rect = self.msg_surface.get_rect()
         self.msg_rect.topleft = (10,10)
         self.window_surface_obj.blit(self.msg_surface, self.msg_rect)
-        
+        0
         for event in pygame.event.get():
             'DOOOO NOTHIIIIIINGG'
             
@@ -85,16 +88,15 @@ class Game:
             if visual:
                 board = [[0]*self.board_height for i in xrange(self.board_width)]
                 for i in object:
-                    board[i][0] = 1
+                    board[i][0] += 1
                 for i in agent:
-                    board[i][Game.board_height-1] = 2
+                    board[i][Game.board_height-1] += 2
                 self.visual_frame(score, board)
                 
             for step in xrange(Game.board_height):
                 sensor_input = [i in object for i in agent]
                 left_motion, right_motion = ctrnn.timestep(sensor_input)
-                motion_sum = left_motion + right_motion
-                motion = int(round((motion_sum)*Game.max_motion - Game.max_motion))
+                motion = int(round((right_motion - left_motion)*Game.max_motion))
                 agent = [(i + motion)%Game.board_width for i in agent]
                 if Game.horizontal_direction != 0:
                     object = [(i + Game.horizontal_direction)%Game.board_width for i in object]
@@ -102,10 +104,14 @@ class Game:
                 if visual:
                     board = [[0]*self.board_height for i in xrange(Game.board_width)]
                     for i in object:
-                        board[i][step] = 1
+                        board[i][step] += 1
                     for i in agent:
-                        board[i][Game.board_height-1] = 2
+                        board[i][Game.board_height-1] += 2
                     self.visual_frame(score, board)
+                
+            if visual:
+                self.visual_frame(score, board)
+                self.visual_frame(score, board)
                 
             if self.object_sizes[drop] < Game.agent_size:
                 score += reduce(mul, (i in agent for i in object), 1)
