@@ -122,7 +122,7 @@ if __name__ == "__main__":
     parent_selector = parent_selection.gen_parent_selection(litter_size)
  
     num_input = 5
-    num_hidden = 4
+    num_hidden = 2
     num_output = 2
     num_weights = num_hidden*(num_input + num_hidden) + num_output*(num_hidden + num_output)
     num_biases = num_hidden + num_output
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     num_taus = num_hidden + num_output
  
     ranges = []
-    ranges += [(-5.0, 5.0)]*num_weights 
+    ranges += [(-10.0, 10.0)]*num_weights 
     ranges += [(-10.0, 0.0)]*num_biases
     ranges += [(1.0, 5.0)]*num_gains
     ranges += [(1.0, 2.0)]*num_taus

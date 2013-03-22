@@ -41,7 +41,7 @@ class Game:
         self.font_obj = pygame.font.Font('freesansbold.ttf', 32)
         
         
-    def visual_frame(self, score, board):
+    def visual_frame(self, score, board, motion):
         '''Draw a single frame and sync to 3 FPS'''
         for x in xrange(Game.board_width):
             for y in xrange(Game.board_height):
@@ -57,7 +57,7 @@ class Game:
                     color = self.purple_color
                 pygame.draw.rect(self.window_surface_obj, color, pygame.Rect(x*Game.block_size, y*Game.block_size, Game.block_size, Game.block_size))
             
-        self.msg_surface = self.font_obj.render("Score: " + str(score), False, self.white_color)
+        self.msg_surface = self.font_obj.render("Score: " + str(score) + ", Speed: " + str(motion), False, self.white_color)
         self.msg_rect = self.msg_surface.get_rect()
         self.msg_rect.topleft = (10,10)
         self.window_surface_obj.blit(self.msg_surface, self.msg_rect)
@@ -66,7 +66,7 @@ class Game:
             'DOOOO NOTHIIIIIINGG'
             
         pygame.display.update()
-        self.fps_clock.tick(10)
+        self.fps_clock.tick(3)
         
  
     def play(self, ctrnn, visual):
@@ -91,7 +91,7 @@ class Game:
                     board[i][0] += 1
                 for i in agent:
                     board[i][Game.board_height-1] += 2
-                self.visual_frame(score, board)
+                self.visual_frame(score, board, 0)
                 
             for step in xrange(Game.board_height):
                 sensor_input = [i in object for i in agent]
@@ -108,7 +108,7 @@ class Game:
                         board[i][step] += 1
                     for i in agent:
                         board[i][Game.board_height-1] += 2
-                    self.visual_frame(score, board)
+                    self.visual_frame(score, board, motion)
                     
             if self.object_sizes[drop] < Game.agent_size:
                 score += reduce(mul, (i in agent for i in object), 1)
@@ -116,8 +116,8 @@ class Game:
                 score += 0 if sum((i in object for i in agent)) else 1.2 
              
             if visual:
-                self.visual_frame(score, board)
-                self.visual_frame(score, board)
+                self.visual_frame(score, board, 0)
+                self.visual_frame(score, board, 0)
                 
             ctrnn.reset()
 
