@@ -66,7 +66,7 @@ class Game:
             'DOOOO NOTHIIIIIINGG'
             
         pygame.display.update()
-        self.fps_clock.tick(3)
+        self.fps_clock.tick(10)
         
  
     def play(self, ctrnn, visual):
