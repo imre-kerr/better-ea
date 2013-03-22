@@ -130,7 +130,7 @@ if __name__ == "__main__":
     num_taus = num_hidden + num_output
  
     ranges = []
-    ranges += [(-10.0, 10.0)]*num_weights 
+    ranges += [(-5.0, 5.0)]*num_weights 
     ranges += [(-10.0, 0.0)]*num_biases
     ranges += [(1.0, 5.0)]*num_gains
     ranges += [(1.0, 2.0)]*num_taus

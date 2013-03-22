@@ -96,7 +96,7 @@ While evolving solutions to the case where the object falls with a horisontal sp
 Funker ikke særlig bra å legge til flere interne noder. Skrive noe lurt om det.
 
 \section{Changed Parameter Ranges}
-\paragraph{}While testing, we found that most of the evolved agents would search at a speed of one unit per turn. This would often turn out to be too slow, so we decided to see if we could encourage faster movement by changing some parameter. Allowing weights to span [-10.0, +10.0] (as opposed to [-5.0, +5.0]) seemed like a natural choice for this.
+\paragraph{}While testing, we found that most of the evolved agents would search at a speed of one unit per turn. This would often turn out to be too slow, so we decided to see if we could encourage faster movement by changing some parameter. Allowing weights to span [-10.0, +10.0] (as opposed to [-5.0, +5.0]) seemed like a natural choice for this. We ran the tests with population size 75, litter size 75, and generation count 200.
 \subsection{Results}
 \paragraph{}We did five runs, and these were the results:
 \begin{enumerate}
@@ -106,5 +106,6 @@ Funker ikke særlig bra å legge til flere interne noder. Skrive noe lurt om det
 \item{Search speed oscillates with a 4-4-0 pattern. If it gets lucky and stops under a small object, it stays there to catch it, otherwise it just keeps going}
 \item{Searches at speed 4. Catches most of the time, sometimes runs past and then catches on the second run. Avoidance: Slows down for a bit, then goes back to speed 4.}
 \end{enumerate}
+\paragraph{}We clearly see that we accomplished what we set out to do, which was to increase the search speed. However, this introduces new problems, such as catching not always working properly. A search speed of 2 or 3 seems to work best, so maybe the [-10.0, 10.0] range was a bit much.
 
 \end{document}
