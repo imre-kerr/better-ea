@@ -11,7 +11,7 @@ class Game:
     board_width = 30
     board_height = 15
     block_size = 30
-    horizontal_direction = 1
+    horizontal_direction = 0
     num_drops = 40
     
 
@@ -108,15 +108,15 @@ class Game:
                     for i in agent:
                         board[i][Game.board_height-1] += 2
                     self.visual_frame(score, board)
-                
-            if visual:
-                self.visual_frame(score, board)
-                self.visual_frame(score, board)
-                
+                    
             if self.object_sizes[drop] < Game.agent_size:
                 score += reduce(mul, (i in agent for i in object), 1)
             else:
-                score += 0 if sum((i in object for i in agent)) else 1.2
+                score += 0 if sum((i in object for i in agent)) else 1.2 
+             
+            if visual:
+                self.visual_frame(score, board)
+                self.visual_frame(score, board)
                 
             ctrnn.reset()
 
