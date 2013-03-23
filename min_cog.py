@@ -3,7 +3,6 @@ import copy
 import pylab
 import multiprocessing as mp
 
-from ea import adult_selection
 from ea import parent_selection
 from ea import reproduction
 from ea import float_gtype
@@ -17,8 +16,9 @@ def fitness_thread(agent, game):
     '''A single fitness testing thread'''
     return game.play(agent, False)
     
-def fitness_test_mp(population, game):
+def fitness_test_mp(population):
     '''Multiprocessing fitness test'''
+    game = min_cog_game.Game()
     games = [copy.deepcopy(game) for i in xrange(len(population))]
     pool = mp.Pool(mp.cpu_count())
     indices = []
@@ -30,7 +30,7 @@ def fitness_test_mp(population, game):
         population[indices[i]].fitness = worker.get()
     pool.close()
     pool.join()
-    
+
 def develop(population, num_input, num_hidden, num_output):
     '''Create CTRNN objects from float lists.'''
     num_weights = num_hidden*(num_input + num_hidden) + num_output*(num_hidden + num_output)
@@ -39,8 +39,8 @@ def develop(population, num_input, num_hidden, num_output):
     num_taus = num_hidden + num_output
     
     for ind in population:
-		if ind.ptype is not None:
-			continue
+        if ind.ptype is not None:
+            continue
         i = 0
         weight_list = ind.gtype[i:i+num_weights]
         i += num_weights
@@ -55,44 +55,18 @@ def develop(population, num_input, num_hidden, num_output):
         
 def visualize(generation_list):
     '''Generate pretty pictures using pylab and pygame'''
-    best = []
-    average = []
-    stddev = []
-    average_plus_stddev = []
-    average_minus_stddev = []
-    for pop in generation_list:
-        best += [most_fit(pop).fitness]
-        average += [avg_fitness(pop)]
-        stddev += [fitness_stddev(pop)] 
-        average_plus_stddev += [average[-1] + stddev[-1]]
-        average_minus_stddev += [average[-1] - stddev[-1]]
-    
-    pylab.figure(1)
-    pylab.fill_between(range(len(generation_list)), average_plus_stddev, average_minus_stddev, alpha=0.2, color='b', label="Standard deviation")
-    pylab.plot(range(len(generation_list)), best, color='r', label='Best')
-    pylab.plot(range(len(generation_list)), average, color='b', label='Average with std.dev.')
-    pylab.title("Fitness plot - Beer-cog")
-    pylab.xlabel("Generation")
-    pylab.ylabel("Fitness")
-    pylab.legend(loc="upper left")
-    pylab.savefig("mincog_fitness.png")
-
-    best_index = best.index(max(best))
-    best_individual = most_fit(generation_list[-1])
-
-    with open('last.txt','w') as f:
-        f.write(str(best_individual.gtype))
-    print best_individual.gtype
-    
     game = min_cog_game.Game()
-    game.play(best_individual.ptype, True)
+    ctrnn_list = [ind.ptype for ind in pareto_front(generation_list[-1])]
+    for ind in pareto_front(generation_list[-1]):
+        print ind.fitness
+    print "Visualizing " + str(len(ctrnn_list)) + " agents."
+    game.play_list(ctrnn_list)
     
         
 if __name__ == "__main__":
     popsize = int(raw_input("Input population size:\n"))
     
-    adult_selector, litter_size = adult_selection.gen_adult_selection(popsize)
-    parent_selector = parent_selection.gen_parent_selection(litter_size)
+    parent_selector = parent_selection.gen_parent_selection(popsize)
  
     num_input = 5
     num_hidden = 2
@@ -112,14 +86,14 @@ if __name__ == "__main__":
     crossover = float_gtype.gen_crossover()
     reproducer = reproduction.gen_reproduction(mutate, crossover)
 
+    maximization = [True, False]
+    limits = [(0, 1), (0, 2400)]
+
     generations = int(raw_input("Input max number of generations:\n"))
-    fitness_goal = float(raw_input("Input fitness goal, 0 for none:\n"))
     
     development = partial(develop, num_input=num_input, num_hidden=num_hidden, num_output=num_output)
-    fitness_tester = gen_fitness()
     
-    initial = [individual(gtype=float_gtype.generate(ranges), age=0) for i in xrange(popsize)]
-    
-    generation_list = main.evolutionary_algorithm(initial, development, fitness_tester, adult_selector, parent_selector, reproducer, generations, fitness_goal)
+    initial = [individual(gtype=float_gtype.generate(ranges)) for i in xrange(popsize)]
+    generation_list = main.evolutionary_algorithm(initial, development, fitness_test_mp, reproducer, parent_selector, generations, maximization, limits)
     
     visualize(generation_list)

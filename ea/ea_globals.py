@@ -13,4 +13,4 @@ class individual:
 
 def pareto_front(population):
     '''Return the Pareto front or whatever it's called'''
-    return [ind in population if ind.rank == 0]
+    return [ind for ind in population if ind.rank == 0]

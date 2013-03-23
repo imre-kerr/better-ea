@@ -6,7 +6,7 @@ def reproduction(parent_list, mutate, crossover):
     for mom, dad in parent_list:
         kid = crossover(mom, dad)
         kid = mutate(kid)
-        kids += [individual(gtype=kid, age=0)]
+        kids += [individual(gtype=kid)]
     return kids
 
 def gen_reproduction(mutate, crossover):

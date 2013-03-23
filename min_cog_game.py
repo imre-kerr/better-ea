@@ -41,7 +41,7 @@ class Game:
         self.font_obj = pygame.font.Font('freesansbold.ttf', 32)
         
         
-    def visual_frame(self, score, board, motion):
+    def visual_frame(self, score, total_movement, board, motion):
         '''Draw a single frame and sync to 3 FPS'''
         for x in xrange(Game.board_width):
             for y in xrange(Game.board_height):
@@ -56,8 +56,10 @@ class Game:
                 else:
                     color = self.purple_color
                 pygame.draw.rect(self.window_surface_obj, color, pygame.Rect(x*Game.block_size, y*Game.block_size, Game.block_size, Game.block_size))
-            
-        self.msg_surface = self.font_obj.render("Score: " + str(score) + ", Speed: " + str(motion), False, self.white_color)
+        msg_string = "Score: " + str(score) 
+        msg_string += ", Speed: " + str(motion) 
+        msg_string += ", Total Movement: " + str(total_movement)
+        self.msg_surface = self.font_obj.render(msg_string, False, self.white_color)
         self.msg_rect = self.msg_surface.get_rect()
         self.msg_rect.topleft = (10,10)
         self.window_surface_obj.blit(self.msg_surface, self.msg_rect)
@@ -68,7 +70,22 @@ class Game:
         pygame.display.update()
         self.fps_clock.tick(10)
         
- 
+    def play_single(self, ctrnn, visual):
+        '''Can't have more than one init and one quit(possibly)'''
+        if visual:
+            self.visual_init()
+        result = self.play(ctrnn, visual)
+        if visual:
+            pygame.quit()
+        return result
+
+    def play_list(self, ctrnn_list):
+        '''Can't have more than one init and one quit(possibly)'''
+        self.visual_init()
+        for ctrnn in ctrnn_list:
+            self.play(ctrnn, True)
+        pygame.quit()    
+
     def play(self, ctrnn, visual):
         '''Plays a game with the CTRNN argument as the controller.
         
@@ -76,11 +93,8 @@ class Game:
         If visual is True, a visualization of the gameplay should be shown.'''
         
         score = 0
-		total_movement = 0
+        total_movement = 0
         max_score = 0
-        
-        if visual:
-            self.visual_init()
         
         for drop in xrange(Game.num_drops):
             object = range(self.object_positions[drop], self.object_positions[drop] + self.object_sizes[drop])
@@ -101,7 +115,7 @@ class Game:
                 motion_sum = left_motion + right_motion
                 motion = int(round((motion_sum)*Game.max_motion - Game.max_motion))
                 agent = [(i + motion)%Game.board_width for i in agent]
-				total_movement += abs(motion)
+                total_movement += abs(motion)
                 if Game.horizontal_direction != 0:
                     object = [(i + Game.horizontal_direction)%Game.board_width for i in object]
             
@@ -125,10 +139,7 @@ class Game:
                 self.visual_frame(score, total_movement, board, 0)
                 
             ctrnn.reset()
-
-        if visual:
-            pygame.quit()
         
         score /= max_score
-        movement_score = 1/total_movement
+        movement_score = total_movement
         return [score, movement_score]
