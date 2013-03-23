@@ -8,7 +8,7 @@ class individual:
         self.gtype = gtype
         self.ptype = ptype
         self.fitness = fitness
-		self.rank = rank
+        self.rank = rank
 
 def pareto_front(population):
     '''Return the Pareto front or whatever it's called'''
