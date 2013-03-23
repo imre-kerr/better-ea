@@ -20,8 +20,8 @@ def crowded_comparison(ind_a, ind_b):
 
 def dominates(ind_a, ind_b, maximization):
     '''Return True if A dominates B, i.e. some fitness of A is better and none are worse'''
-    if ind_a.fitness == ind_b.fitness: # == compares values and not addresses
-        return False
+    if ind_a.fitness == ind_b.fitness:
+        return id(ind_a) < id(ind_b) # There can be only one!
     else:
         for i in xrange(len(ind_a.fitness)):
             if maximization[i]:
