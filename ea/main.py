@@ -2,9 +2,11 @@ from ea_globals import *
 from sys import stdout
 import copy
 
+INF = float('Inf')
+
 def crowded_comparison(ind_a, ind_b):
     '''Compare two individuals, preferring the one with the lowest rank, or the one
-    with the highest crowding distance if they are the same rank'''
+    with the highest crowding distance if they are the same rank. Used for sorting.'''
     if ind_a.rank != ind_b.rank:
         return ind_b.rank - ind_a.rank
     else:
@@ -21,10 +23,51 @@ def dominates(ind_a, ind_b):
         return True
 
 def crowding_distance_assignment(front):
-    '''Assigns a crowding distance to each individual in front'''
+    '''Assign a crowding distance to each individual in front.
+    NOTE: Assumes goal=max, f_min=0 and f_max=1 for all objectives.'''
+    for ind in front:
+        ind.distance = 0
+    num_objectives = len(front[0].fitness)
+    for m in xrange(num_objectives):
+        objective_getter = (lambda ind: ind.fitness[m])
+        front.sort(key=objective_getter, reverse=True)
+        front[0].distance = front[-1].distance = INF
+        for i in xrange(1, len(front)-1):
+            front[i].distance += (front[i+1].fitness[m] - front[i-1].fitness[m])
     
 def fast_non_dominated_sort(population):
     '''Assigns nondomination ranks in O(MN^2) time, which is fancy'''
+    popsize = len(population)
+
+    # dominated_sets[i] -> the set of indexes to solutions dominated by solution i
+    dominated_sets = [[] for i in xrange(popsize)]
+
+    # domination_counts[i] -> number of solutions that dominate solution i
+    domination_counts = [0]*popsize
+
+    fronts = [[]]
+
+    for p in xrange(popsize):
+        for q in xrange(popsize):
+            if dominates(population[p], population[q]):
+                dominated_sets[p].append(q)
+            elif dominates(population[q], population[p]):
+                domination_counts[p] += 1
+        if domination_counts[p] == 0:
+            population[p].rank = 0
+            fronts[0].append(population[p])
+    i = 0
+    while fronts[i]:
+        next_front = []
+        for p in xrange(len(fronts[i])):
+            for q in xrange(popsize):
+                domination_counts[q] -= 1
+                if domination_counts[q] == 0:
+                    population[q].rank = i + 1
+                    next_front.append(population[q])
+        i += 1
+        fronts.append(next_front)
+    return fronts
 
 def evolutionary_algorithm(initial, develop, fitness_test, reproduce, generations):
     '''Main EA loop. 
