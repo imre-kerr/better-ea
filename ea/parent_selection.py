@@ -18,7 +18,7 @@ def stochastic_uniform(population, litter_size):
     
 def rank_proportionate(population, litter_size):
     '''Choose parents with probability proportional to their rank'''
-    rank_list = [ind.rank for ind in population]
+    rank_list = [1/(1+ind.rank) for ind in population]
     gtype_list = [ind.gtype for ind in population]
 
     parents = []
@@ -28,7 +28,7 @@ def rank_proportionate(population, litter_size):
 
 def sigma_scaling(population, litter_size):
     '''Choose parents with probability proportional to their rank, scaled by the population's standard deviation'''
-    rank_list = [ind.rank for ind in population]
+    rank_list = [1/(1+ind.rank) for ind in population]
     gtype_list = [ind.gtype for ind in population]
     avg = sum(rank_list) / len(rank_list)
     sigma = math.sqrt(sum([(f - avg)**2 for f in rank_list]))
@@ -49,8 +49,8 @@ def tournament(population, litter_size, tournament_size):
     for i in xrange(litter_size):
         t1 = random.sample(population, tournament_size)
         t2 = random.sample(population, tournament_size)
-        p1 = max(t1, key=attrgetter('rank'))
-        p2 = max(t2, key=attrgetter('rank'))
+        p1 = min(t1, key=attrgetter('rank'))
+        p2 = min(t2, key=attrgetter('rank'))
         parents += [(p1.gtype, p2.gtype)]
     return parents
 
