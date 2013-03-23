@@ -76,6 +76,7 @@ class Game:
         If visual is True, a visualization of the gameplay should be shown.'''
         
         score = 0
+		total_movement = 0
         max_score = 0
         
         if visual:
@@ -92,7 +93,7 @@ class Game:
                     board[i][0] += 1
                 for i in agent:
                     board[i][Game.board_height-1] += 2
-                self.visual_frame(score, board, 0)
+                self.visual_frame(score, total_movement, board, 0)
                 
             for step in xrange(Game.board_height):
                 sensor_input = [i in object for i in agent]
@@ -100,6 +101,7 @@ class Game:
                 motion_sum = left_motion + right_motion
                 motion = int(round((motion_sum)*Game.max_motion - Game.max_motion))
                 agent = [(i + motion)%Game.board_width for i in agent]
+				total_movement += abs(motion)
                 if Game.horizontal_direction != 0:
                     object = [(i + Game.horizontal_direction)%Game.board_width for i in object]
             
@@ -109,7 +111,7 @@ class Game:
                         board[i][step] += 1
                     for i in agent:
                         board[i][Game.board_height-1] += 2
-                    self.visual_frame(score, board, motion)
+                    self.visual_frame(score, total_movement, board, motion)
                     
             if self.object_sizes[drop] < Game.agent_size:
                 score += reduce(mul, (i in agent for i in object), 1)
@@ -118,9 +120,9 @@ class Game:
                 score += 0 if sum((i in object for i in agent)) else 1.2 
                 max_score += 1.2
              
-            if visual:
-                self.visual_frame(score, board, 0)
-                self.visual_frame(score, board, 0)
+            if visual: # Tack on a few frames to see the end of the run
+                self.visual_frame(score, total_movement, board, 0)
+                self.visual_frame(score, total_movement, board, 0)
                 
             ctrnn.reset()
 
@@ -128,5 +130,5 @@ class Game:
             pygame.quit()
         
         score /= max_score
-        
-        return score
+        movement_score = 1/total_movement
+        return [score, movement_score]

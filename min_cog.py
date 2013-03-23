@@ -27,37 +27,9 @@ def fitness_test_mp(population, game):
         indices += [i]
         workers += [pool.apply_async(fitness_thread, [ind.ptype, games[i]])]
     for i, worker in enumerate(workers):
-        score = worker.get()
-        if population[indices[i]].fitness:
-            population[indices[i]].fitness = (population[indices[i]].fitness + score)/2.
-        else:
-            population[indices[i]].fitness = max(0, score)
+        population[indices[i]].fitness = worker.get()
     pool.close()
     pool.join()
-    return population
-    
-
-def fitness_test(population, visual):
-    '''Play a game with each individual in the population and assign fitness based on score'''
-    game = min_cog_game.Game()
-    if visual:
-        for ind in population:
-            score = game.play(ind.ptype, visual)
-            ind.fitness = max(0, score)
-        return population
-    else:
-        return fitness_test_mp(population, game)
-    
-def gen_fitness():
-    '''Generate the fitness function interactively'''
-    while True:
-        visual = raw_input("Do you want gameplay visualisations? (y/n):\n")
-        if visual == 'y' or visual == 'Y':
-            return partial(fitness_test, visual=True)
-        elif visual == 'n' or visual == 'N':
-            return partial(fitness_test, visual=False)
-        else:
-            print "Please type y or n."
     
 def develop(population, num_input, num_hidden, num_output):
     '''Create CTRNN objects from float lists.'''
@@ -67,6 +39,8 @@ def develop(population, num_input, num_hidden, num_output):
     num_taus = num_hidden + num_output
     
     for ind in population:
+		if ind.ptype is not None:
+			continue
         i = 0
         weight_list = ind.gtype[i:i+num_weights]
         i += num_weights
@@ -78,7 +52,6 @@ def develop(population, num_input, num_hidden, num_output):
         
         ind.ptype = ctrnn.CTRNN(num_input, num_hidden, num_output, 
                                 weight_list, bias_list, gain_list, tau_list)
-    return population
         
 def visualize(generation_list):
     '''Generate pretty pictures using pylab and pygame'''
