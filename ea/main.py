@@ -46,7 +46,7 @@ def crowding_distance_assignment(front, maximization, limits):
             norm = limits[m][1] - limits[m][0]
             front[i].distance += abs(front[i+1].fitness[m] - front[i-1].fitness[m])/norm
 
-    
+            
 def fast_non_dominated_sort(population, maximization):
     '''Assigns nondomination ranks in O(MN^2) time, which is fancy'''
     popsize = len(population)
@@ -85,10 +85,9 @@ def evolutionary_algorithm(initial, develop, fitness_test, reproduce,
                            select_parents, generations, maximization, limits):
     '''Main EA loop. 
     
-    Return a list of all generations, each a list of individuals'''
+    Return the last generation, because memory usage.'''
     popsize = len(initial)
 
-    generation_list = []
     parent_population = initial
     child_population = []
 
@@ -111,10 +110,9 @@ def evolutionary_algorithm(initial, develop, fitness_test, reproduce,
         crowding_distance_assignment(fronts[i], maximization, limits)
         fronts[i].sort(reverse=True, cmp=crowded_comparison)
         parent_population += fronts[i][:popsize-len(parent_population)]
-        generation_list += [copy.deepcopy(parent_population)]
         parent_list = select_parents(parent_population)
         child_population = reproduce(parent_list)
 
         stdout.write('\b'*len(generation_s))
     print ""
-    return generation_list
+    return [parent_population]

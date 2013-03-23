@@ -24,12 +24,20 @@ def fitness_test_mp(population):
     indices = []
     workers = []
     for i, ind in enumerate(population):
-        indices += [i]
-        workers += [pool.apply_async(fitness_thread, [ind.ptype, games[i]])]
+        if ind.fitness is not None:
+            indices += [i]
+            workers += [pool.apply_async(fitness_thread, [ind.ptype, games[i]])]
     for i, worker in enumerate(workers):
         population[indices[i]].fitness = worker.get()
     pool.close()
     pool.join()
+    
+def fitness_test(population):
+    '''Single-processor fitness test (for profiling)'''
+    game = min_cog_game.Game()
+    for ind in population:
+        ind.fitness = game.play(ind.ptype, False)
+    return population
 
 def develop(population, num_input, num_hidden, num_output):
     '''Create CTRNN objects from float lists.'''
