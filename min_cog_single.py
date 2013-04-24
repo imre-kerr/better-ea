@@ -5,7 +5,7 @@ if __name__ == "__main__":
     gtype = input()
 
     num_input = 5
-    num_hidden = 4
+    num_hidden = 2
     num_output = 2
 
     num_weights = num_hidden*(num_input + num_hidden) + num_output*(num_hidden + num_output)

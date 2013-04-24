@@ -47,14 +47,20 @@ def weighted_average_crossover(gtype1, gtype2):
         crossed += [gtype1[i]*rand + gtype2[i]*(1-rand)]
     return crossed
 
+def no_crossover(gtype1, gtype2):
+    '''Return the first gtype with no crossover'''
+    return list(gtype1)
+
 def gen_crossover():
     '''Generate a crossover function'''
     while True:
-        method = raw_input("Input crossover method(choice, wavg):\n")
+        method = raw_input("Input crossover method(choice/wavg/none):\n")
         if method == 'choice':
             return choice_crossover
         elif method == 'wavg':
             return weighted_average_crossover
+        elif method == 'none':
+            return no_crossover
         else:
             print "Unrecognized method: " + method
 
